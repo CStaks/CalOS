@@ -47,8 +47,8 @@ dnf5 install -y ghostty
 dnf5 -y copr disable scottames/ghostty
 
 ### Neovim + LazyVim (terminal IDE)
-# Install neovim and its ecosystem dependencies
-dnf5 install -y neovim ripgrep fd-find lazygit gcc gcc-c++ make unzip
+# Install neovim and its ecosystem dependencies (lazygit is preinstalled on Bluefin)
+dnf5 install -y neovim ripgrep fd-find --skip-unavailable
 
 # Preload LazyVim starter config for new users
 # Cloned into /etc/skel/ so every new user gets LazyVim out of the box
