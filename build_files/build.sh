@@ -24,8 +24,7 @@ glib-compile-schemas /usr/share/glib-2.0/schemas/
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
 ### Starship prompt (direct binary — not in Fedora repos)
-mkdir -p /usr/local/bin
-curl -fsSL https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-gnu.tar.gz | tar xz -C /usr/local/bin
+curl -fsSL https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-gnu.tar.gz | tar xz -C /usr/bin
 
 ### Zed Editor (replaces VSCode as primary IDE)
 curl -f https://zed.dev/install.sh | sh
