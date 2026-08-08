@@ -2,21 +2,12 @@
 
 set -ouex pipefail
 
-### REBRAND: Replace Bluefin branding with CalOS
-# Remove Bluefin-specific branding packages (ok if they don't exist)
+### REBRAND: Remove Bluefin branding packages and VSCode
+# Do removes first while Fedora os-release is still intact (dnf5 needs correct VERSION_ID)
 dnf5 remove -y bluefin-logos bluefin-release bluefin-gtk-theme 2>/dev/null || true
-
-# Remove VSCode (we use Zed instead)
 dnf5 remove -y code 2>/dev/null || true
 
-# Copy the contents of system_files/ of the git repo to /
-# This overlays our CalOS os-release, wallpapers, logos, and gschema overrides
-cp -avf "/ctx/system_files"/. /
-
-# Compile GSettings schemas so our wallpaper/favorites override takes effect
-glib-compile-schemas /usr/share/glib-2.0/schemas/
-
-### Install packages
+### Install packages (all done BEFORE overlaying CalOS os-release)
 
 # Packages can be installed from any enabled yum repo on the image.
 # RPMfusion repos are available by default in ublue main images
@@ -65,6 +56,12 @@ LAZYVIM_SKEL="/etc/skel/.config/nvim"
 mkdir -p "$(dirname "$LAZYVIM_SKEL")"
 git clone https://github.com/LazyVim/starter.git "$LAZYVIM_SKEL"
 rm -rf "$LAZYVIM_SKEL/.git"
+
+### Overlay CalOS branding files (after all installs — os-release must NOT override Fedora VERSION_ID yet)
+# Copy the contents of system_files/ of the git repo to /
+cp -avf "/ctx/system_files"/. /
+# Compile GSettings schemas so our wallpaper/favorites override takes effect
+glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 ### Activate CalOS Plymouth boot theme
 # Set CalOS as the default Plymouth theme
