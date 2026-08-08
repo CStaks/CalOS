@@ -1,0 +1,15 @@
+[org.gnome.desktop.background]
+picture-uri='file:///usr/share/backgrounds/calos/mountains.png'
+picture-uri-dark='file:///usr/share/backgrounds/calos/night-iceberg.png'
+
+[org.gnome.desktop.screensaver]
+picture-uri='file:///usr/share/backgrounds/calos/mountains.png'
+
+[org.gnome.shell]
+favorite-apps=['org.gnome.Nautilus.desktop', 'brave-browser.desktop', 'dev.zed.Zed.desktop', 'com.mitchellh.ghostty.desktop', 'org.gnome.Software.desktop', 'org.gnome.Settings.desktop']
+
+[org.gnome.desktop.default-applications.terminal]
+exec='ghostty'
+
+[org.gnome.login-screen]
+logo='/usr/share/pixmaps/CalOS.svg'

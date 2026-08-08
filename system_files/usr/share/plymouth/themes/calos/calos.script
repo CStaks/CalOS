@@ -1,0 +1,55 @@
+// CalOS Plymouth Boot Theme
+// Dark background (#050505), accent spinner (#FF3B00), light text (#E0E0E0)
+
+Window.SetBackgroundTopColor(0.0196, 0.0196, 0.0196);  // #050505
+Window.SetBackgroundBottomColor(0.0196, 0.0196, 0.0196); // #050505
+
+logo = Image.New();
+// No image logo - clean text-based boot
+
+title = Sprite.New();
+title.SetX(Window.GetWidth() / 2 - 200);
+title.SetY(Window.GetHeight() / 2 - 60);
+title.SetZ(10);
+
+message = Sprite.New();
+message.SetX(Window.GetWidth() / 2 - 200);
+message.SetY(Window.GetHeight() / 2 + 10);
+message.SetZ(10);
+
+// Spinner dots
+spinner_dot1 = Rectangle.New();
+spinner_dot1.SetSize(8, 8);
+spinner_dot1.SetX(Window.GetWidth() / 2 - 20);
+spinner_dot1.SetY(Window.GetHeight() / 2 + 60);
+spinner_dot1.SetZ(10);
+spinner_dot1.SetColor(1.0, 0.231, 0.0, 1.0); // #FF3B00
+
+spinner_dot2 = Rectangle.New();
+spinner_dot2.SetSize(8, 8);
+spinner_dot2.SetX(Window.GetWidth() / 2);
+spinner_dot2.SetY(Window.GetHeight() / 2 + 60);
+spinner_dot2.SetZ(10);
+spinner_dot2.SetColor(1.0, 0.231, 0.0, 0.6); // #FF3B00 faded
+
+spinner_dot3 = Rectangle.New();
+spinner_dot3.SetSize(8, 8);
+spinner_dot3.SetX(Window.GetWidth() / 2 + 20);
+spinner_dot3.SetY(Window.GetHeight() / 2 + 60);
+spinner_dot3.SetZ(10);
+spinner_dot3.SetColor(1.0, 0.231, 0.0, 0.3); // #FF3B00 more faded
+
+title_text = "CalOS";
+title.SetText(title_text);
+
+Plymouth.SetRefreshFunction (function ()
+    if (Plymouth.GetMode() == "boot")
+        title.SetText(title_text);
+    else if (Plymouth.GetMode() == "shutdown")
+        title.SetText("Shutting down...");
+    else if (Plymouth.GetMode() == "restart")
+        title.SetText("Restarting...");
+    end
+
+    message.SetText(Plymouth.GetDisplayMessage());
+end)

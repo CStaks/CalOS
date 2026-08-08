@@ -93,7 +93,8 @@ sudoif command *args:
 #
 
 # Build the image using the specified parameters
-build $target_image=image_name $tag=default_tag:
+# Optional extra_args: space-separated list of extra --build-arg KEY=VALUE pairs for podman
+build $target_image=image_name $tag=default_tag $extra_args="":
     #!/usr/bin/env bash
 
     set -euox pipefail
@@ -123,6 +124,13 @@ build $target_image=image_name $tag=default_tag:
 
     # This actually builds the image!
     PODMAN_BUILD_ARGS=("${BUILD_ARGS[@]}" "${LABELS[@]}" --pull=newer --tag "${target_image}:${tag}" --file Containerfile)
+
+    # Append extra build-args if provided (space-separated KEY=VALUE pairs)
+    if [[ -n "${extra_args}" ]]; then
+        for arg in ${extra_args}; do
+            PODMAN_BUILD_ARGS+=("--build-arg" "${arg}")
+        done
+    fi
 
     podman build "${PODMAN_BUILD_ARGS[@]}" .
 
@@ -212,10 +220,8 @@ generate-build-tags $target_image=image_name $tag=default_tag:
         GIT_SHA=$(git rev-parse --short HEAD)
         BUILD_TAGS+=("${tag}-${GIT_SHA}")
         BUILD_TAGS+=("${tag}-${DATE}-${GIT_SHA}")
-        BUILD_TAGS+=("${DATE}-${GIT_SHA}")
     fi
 
-    BUILD_TAGS+=("${DATE}")
     BUILD_TAGS+=("${tag}")
     BUILD_TAGS+=("${tag}-${DATE}")
 

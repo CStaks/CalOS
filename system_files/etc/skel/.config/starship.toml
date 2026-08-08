@@ -1,0 +1,54 @@
+# CalOS Starship Prompt
+# Brand colors: #FF3B00 (accent), #050505 (bg), #E0E0E0 (text)
+
+format = """
+[](#FF3B00)\
+$os\
+$username\
+[](bg:#FF3B00 fg:#050505)\
+$directory\
+[](fg:#FF3B00 bg:#333333)\
+$git_branch\
+$git_status\
+[](fg:#333333)\
+$fill\
+$cmd_duration\
+$line_break\
+$character\
+"""
+
+[os]
+disabled = false
+format = "[](fg:#FF3B00)[ calos ](bg:#FF3B00 fg:#050505)"
+
+[username]
+show_always = true
+style_user = "bg:#FF3B00 fg:#050505"
+style_root = "bg:#FF3B00 fg:#050505"
+format = "[](fg:#FF3B00)[ $user ](bg:#FF3B00 fg:#050505)"
+
+[directory]
+style = "bg:#FF3B00 fg:#050505"
+format = "[](fg:#FF3B00 bg:#333333)[ $path ](bg:#333333 fg:#E0E0E0)"
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+symbol = " "
+style = "bg:#333333 fg:#E0E0E0"
+format = "[](fg:#333333 bg:#222222)[ $symbol$branch ](bg:#222222 fg:#E0E0E0)"
+
+[git_status]
+style = "bg:#222222 fg:#E0E0E0"
+format = '[$all_status$ahead_behind](bg:#222222 fg:#E0E0E0)'
+
+[fill]
+symbol = " "
+
+[cmd_duration]
+style = "fg:#E0E0E0"
+format = "[ took $duration ](fg:#E0E0E0)"
+
+[character]
+success_symbol = "[❯](bold fg:#FF3B00)"
+error_symbol = "[❯](bold fg:red)"

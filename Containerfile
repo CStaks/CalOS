@@ -4,14 +4,15 @@ COPY build_files /
 COPY system_files /system_files
 
 # Base Image
-FROM ghcr.io/ublue-os/bluefin:stable
-
+# Use --build-arg BASE_IMAGE=... to override (e.g. ghcr.io/ublue-os/bluefin-nvidia-open:stable)
+ARG BASE_IMAGE=ghcr.io/ublue-os/bluefin:stable
+FROM ${BASE_IMAGE}
 
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:testing
 # FROM ghcr.io/ublue-os/aurora:stable
 # FROM ghcr.io/ublue-os/bluefin-nvidia-open:stable
-# 
+#
 # ... and so on, here are more base images
 # Universal Blue Images: https://github.com/orgs/ublue-os/packages
 # Fedora base image: quay.io/fedora/fedora-bootc:44

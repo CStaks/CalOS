@@ -22,8 +22,18 @@ concurrency:
 
 jobs:
   build_push:
-    name: Build and push image
+    name: Build ${{ matrix.variant.name }}
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        variant:
+          - name: standard
+            suffix: ""
+            base_image: "ghcr.io/ublue-os/bluefin:stable"
+          - name: nvidia
+            suffix: "-nvidia"
+            base_image: "ghcr.io/ublue-os/bluefin-nvidia-open:stable"
 
     permissions:
       contents: read
@@ -56,7 +66,7 @@ jobs:
       - name: Default Tag
         id: gen-default-tag
         run: |
-          DEFAULT_TAG=$(just generate-default-tag)
+          DEFAULT_TAG="$(just generate-default-tag)${{ matrix.variant.suffix }}"
 
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
 
@@ -66,13 +76,14 @@ jobs:
           echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
           echo "IMAGE_NAME=${IMAGE_NAME,,}" >> ${GITHUB_ENV}
 
-      # This actually builds the container image
+      # This actually builds the container image (with matrix variant base image)
       - name: Build Image
         id: build-image
         run: |
           sudo -E $(command -v just) build \
             ${IMAGE_NAME} \
-            ${DEFAULT_TAG}
+            ${DEFAULT_TAG} \
+            "BASE_IMAGE=${{ matrix.variant.base_image }}"
 
       # This is optional, this provides smaller delta updates
       - name: Rechunk with rpm-ostree

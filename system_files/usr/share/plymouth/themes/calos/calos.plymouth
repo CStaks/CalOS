@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=CalOS
+Description=CalOS Boot Screen
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/calos
+ScriptFile=/usr/share/plymouth/themes/calos/calos.script
