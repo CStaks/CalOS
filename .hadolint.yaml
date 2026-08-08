@@ -1,0 +1,10 @@
+# Hadolint configuration
+# See: https://github.com/hadolint/hadolint#configure
+ignored:
+  # DL3006: "Always tag the version of an image explicitly."
+  # The base image is intentionally parameterized via `ARG BASE_IMAGE` (whose
+  # default IS tagged, e.g. ghcr.io/ublue-os/bluefin:stable) so that the same
+  # Containerfile can build multiple variants from the CI build matrix
+  # (.github/workflows/build.yml). Hadolint cannot statically verify the tag
+  # of a variable-based image, so this rule is ignored with justification.
+  - DL3006
