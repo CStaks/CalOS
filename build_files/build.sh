@@ -23,18 +23,12 @@ glib-compile-schemas /usr/share/glib-2.0/schemas/
 # List of rpmfusion packages can be found here:
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
-# Install starship prompt (not in Fedora repos — use official install script)
-curl -fsSL https://starship.rs/install.sh | sh -s -- -y
-
-### Visual Polish: Starship prompt, Plymouth boot, GDM, GRUB
-
-### Install Zed Editor (replaces VSCode as primary IDE)
-# Add the Terra repository which provides up-to-date Zed RPMs
+# Install starship prompt from Terra repo (not in Fedora repos)
+# Terra is also used below for Zed — we enable it once, install both, then disable
 dnf5 install --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' \
   --setopt='terra.gpgkey=https://repos.fyralabs.com/terra$releasever/key.asc' \
   terra-release -y
-dnf5 install -y zed
-# Disable the Terra repo so it doesn't remain enabled on the final image
+dnf5 install -y starship zed
 dnf5 config-manager --disable terra 2>/dev/null || true
 
 ### Brave Browser (replaces Firefox)
