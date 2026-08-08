@@ -40,11 +40,11 @@ dnf5 config-manager --disable brave-browser 2>/dev/null || true
 dnf5 remove -y firefox 2>/dev/null || true
 
 ### Ghostty Terminal (replaces GNOME Terminal)
-# Enable the pgdev/ghostty COPR repository
-dnf5 -y copr enable pgdev/ghostty
+# Enable the scottames/ghostty COPR repository (has Fedora 44 builds)
+dnf5 -y copr enable scottames/ghostty
 dnf5 install -y ghostty
 # Disable the COPR so it doesn't remain enabled on the final image
-dnf5 -y copr disable pgdev/ghostty
+dnf5 -y copr disable scottames/ghostty
 
 ### Neovim + LazyVim (terminal IDE)
 # Install neovim and its ecosystem dependencies
