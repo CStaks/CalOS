@@ -23,8 +23,8 @@ glib-compile-schemas /usr/share/glib-2.0/schemas/
 # List of rpmfusion packages can be found here:
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
-# this installs a package from fedora repos
-dnf5 install -y tmux neofetch starship
+# Install starship prompt (not in Fedora repos — use official install script)
+curl -fsSL https://starship.rs/install.sh | sh -s -- -y
 
 ### Visual Polish: Starship prompt, Plymouth boot, GDM, GRUB
 
