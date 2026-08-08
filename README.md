@@ -1,5 +1,5 @@
 # CalOS
-<img height="150" src="CalOS/CalOS.png">
+<img height="150" src="CalOS/calos-github-social.png">
 
 A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bluefin).
 
