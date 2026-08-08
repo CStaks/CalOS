@@ -32,8 +32,7 @@ curl -fsSL https://zed.dev/api/releases/stable/latest/zed-linux-x86_64.tar.gz -o
 mkdir -p /tmp/zed-install
 tar xzf /tmp/zed.tar.gz -C /tmp/zed-install
 cp /tmp/zed-install/zed.app/bin/zed /usr/bin/
-cp /tmp/zed-install/zed.app/bin/cli /usr/bin/
-cp /tmp/zed-install/zed.app/share/applications/dev.zed.Zed.desktop /usr/share/applications/
+cp /tmp/zed-install/zed.app/share/applications/dev.zed.Zed.desktop /usr/share/applications/ 2>/dev/null || true
 # Install Zed icons so the .desktop file works
 mkdir -p /usr/share/icons/hicolor
 cp -r /tmp/zed-install/zed.app/share/icons/hicolor/* /usr/share/icons/hicolor/ 2>/dev/null || true
