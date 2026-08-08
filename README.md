@@ -1,6 +1,9 @@
 # CalOS
 
-A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bluefin), fully rebranded with a curated app stack and visual polish.
+A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bluefin).
+
+> [!WARNING]
+> This is a side project and may stop recieving updates at any time.
 
 ## Variants
 
