@@ -27,7 +27,17 @@ glib-compile-schemas /usr/share/glib-2.0/schemas/
 curl -fsSL https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-gnu.tar.gz | tar xz -C /usr/bin
 
 ### Zed Editor (replaces VSCode as primary IDE)
-curl -f https://zed.dev/install.sh | sh
+# Manual tarball install — avoids /root not being a directory in the container
+curl -fsSL https://zed.dev/api/releases/stable/latest/zed-linux-x86_64.tar.gz -o /tmp/zed.tar.gz
+mkdir -p /tmp/zed-install
+tar xzf /tmp/zed.tar.gz -C /tmp/zed-install
+cp /tmp/zed-install/zed.app/bin/zed /usr/bin/
+cp /tmp/zed-install/zed.app/bin/cli /usr/bin/
+cp /tmp/zed-install/zed.app/share/applications/dev.zed.Zed.desktop /usr/share/applications/
+# Install Zed icons so the .desktop file works
+mkdir -p /usr/share/icons/hicolor
+cp -r /tmp/zed-install/zed.app/share/icons/hicolor/* /usr/share/icons/hicolor/ 2>/dev/null || true
+rm -rf /tmp/zed.tar.gz /tmp/zed-install
 
 ### Brave Browser (replaces Firefox)
 # Import Brave's GPG key and add their official RPM repo
