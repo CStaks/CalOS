@@ -2,19 +2,13 @@
 name: Build disk images
 
 on:
-  workflow_dispatch:
-    inputs:
-      upload-to-s3:
-        description: "Upload to S3"
-        required: false
-        default: false
-        type: boolean
-      platform:
-        required: true
-        type: choice
-        options:
-          - amd64
-          - arm64
+  schedule:
+    - cron: '15 11 * * *'  # 11:15am UTC, after the daily container build
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md'
   pull_request:
     branches:
       - main
@@ -22,6 +16,21 @@ on:
       - './disk_config/disk.toml'
       - './disk_config/iso-gnome.toml'
       - './.github/workflows/build-disk.yml'
+  workflow_dispatch:
+    inputs:
+      create-release:
+        description: "Create a GitHub Release with download links"
+        required: false
+        default: true
+        type: boolean
+      platform:
+        description: "Build platform"
+        required: false
+        default: amd64
+        type: choice
+        options:
+          - amd64
+          - arm64
 
 env:
   IMAGE_NAME: ${{ github.event.repository.name }} # output of build.yml, keep in sync
@@ -36,7 +45,7 @@ concurrency:
 jobs:
   build:
     name: Build disk images (${{ matrix.variant.name }})
-    runs-on: ${{ inputs.platform == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+    runs-on: ${{ (inputs.platform || 'amd64') == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     strategy:
       fail-fast: false
       matrix:
@@ -69,7 +78,7 @@ jobs:
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> ${GITHUB_ENV}
 
       - name: Install dependencies
-        if: inputs.platform == 'arm64'
+        if: (inputs.platform || 'amd64') == 'arm64'
         run: |
           set -x
           sudo apt update -y
@@ -77,7 +86,7 @@ jobs:
             podman
 
       - name: Maximize build space
-        if: inputs.platform != 'arm64'
+        if: (inputs.platform || 'amd64') != 'arm64'
         uses: ublue-os/remove-unwanted-software@cc0becac701cf642c8f0a6613bbdaf5dc36b259e # v9
         with:
           remove-codeql: true
@@ -97,7 +106,6 @@ jobs:
           additional-args: --use-librepo=True --rootfs btrfs
 
       - name: Upload disk images and Checksum to Job Artifacts
-        if: inputs.upload-to-s3 != true && github.event_name != 'pull_request'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: disk-images-${{ matrix.variant.name }}-${{ matrix.disk-type }}
@@ -107,18 +115,38 @@ jobs:
           compression-level: 0
           overwrite: true
 
-      - name: Upload to S3
-        if: inputs.upload-to-s3 == true && github.event_name != 'pull_request'
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.create-release == true)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download disk images
+        uses: actions/download-artifact@v7
+        with:
+          path: release
+          pattern: disk-images-*
+
+      - name: Create release
         shell: bash
         env:
-          RCLONE_CONFIG_S3_TYPE: s3
-          RCLONE_CONFIG_S3_PROVIDER: ${{ secrets.S3_PROVIDER }}
-          RCLONE_CONFIG_S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
-          RCLONE_CONFIG_S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
-          RCLONE_CONFIG_S3_REGION: ${{ secrets.S3_REGION }}
-          RCLONE_CONFIG_S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
-          SOURCE_DIR: ${{ steps.build.outputs.output-directory }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y rclone
-          rclone copy $SOURCE_DIR S3:${{ secrets.S3_BUCKET_NAME }}/${{ matrix.variant.name }}
+          set -euo pipefail
+          mkdir -p dist
+          for artifact in release/disk-images-*; do
+            [ -d "$artifact" ] || continue
+            variant=$(basename "$artifact" | sed 's/^disk-images-\([^-]*\)-.*/\1/')
+            for file in "$artifact"/*; do
+              [ -f "$file" ] || continue
+              cp "$file" "dist/${variant}-$(basename "$file")"
+            done
+          done
+          gh release delete continuous --yes 2>/dev/null || true
+          NOTES=$(printf 'Latest CalOS disk images.\n\n- **standard** — AMD / Intel GPUs\n- **nvidia** — NVIDIA GPUs\n\nqcow2 files are for VMs, anaconda-iso files are for USB/installer media. This release is replaced on every build, so these download links stay the same.')
+          gh release create continuous dist/* \
+            --title "Latest disk images" \
+            --notes "$NOTES"
+

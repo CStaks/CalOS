@@ -31,6 +31,13 @@ sudo bootc switch ghcr.io/callenflynn/calos:latest-nvidia
 
 Reboot to apply. Updates are automatic — `bootc` checks for new images in the background and stages them for the next reboot.
 
+## Disk images
+
+Prebuilt qcow2 (VMs) and anaconda-iso (USB/installer) images are built daily and published automatically to the [latest release](https://github.com/callenflynn/calos/releases/tag/continuous):
+
+- **standard** — AMD / Intel GPUs
+- **nvidia** — NVIDIA GPUs
+
 ## What's Included
 
 ### Preinstalled Apps
