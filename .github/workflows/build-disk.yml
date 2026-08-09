@@ -104,6 +104,10 @@ jobs:
           types: ${{ matrix.disk-type }}
           additional-args: --use-librepo=True --rootfs btrfs
 
+      - name: Remove manifest JSON files from output
+        run: |
+          rm -f "${{ steps.build.outputs.output-directory }}"/*.json
+
       - name: Upload disk images and Checksum to Job Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -143,6 +147,8 @@ jobs:
             variant=$(basename "$artifact" | sed 's/^disk-images-\([^-]*\)-.*/\1/')
             for file in "$artifact"/*; do
               [ -f "$file" ] || continue
+              # Skip JSON manifest files — only publish actual disk images
+              [[ "$file" == *.json ]] && continue
               cp "$file" "dist/${variant}-$(basename "$file")"
             done
           done
