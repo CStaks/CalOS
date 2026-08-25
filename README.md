@@ -61,15 +61,6 @@ SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page
 | [tmux](https://github.com/tmux/tmux) | — | Terminal multiplexer |
 | [fastfetch](https://github.com/fastfetch-cli/fastfetch) | — | System info with CalOS ASCII art |
 
-### Visual Branding
-
-- **OS identity** — "CalOS" everywhere (Settings → About, GRUB menu, fastfetch)
-- **Plymouth boot screen** — Dark background with CalOS text and #FF3B00 accent spinner
-- **GDM login screen** — CalOS logo on the greeter
-- **Starship prompt** — CalOS-themed with #FF3B00 accent, git info, truncated paths
-- **Wallpapers** — 4 custom wallpapers (mountains, night-iceberg, fuji, macOS-inspired)
-- **Dock** — Files, Brave, Zed, Ghostty, Software, Settings
-
 ### Developer Tools
 
 - **Neovim + LazyVim** — Preloaded starter config, first launch installs all plugins automatically
@@ -78,12 +69,6 @@ SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page
 - **gcc, gcc-c++, make** — Build toolchain
 - **unzip** — Archive extraction
 
-## How It's Built
-
-- **Containerfile** — ARG-based parameterization so one file builds both AMD and NVIDIA variants
-- **build.yml** — Matrix CI builds both variants, pushes signed images to GHCR
-- **build-disk.yml** — Produces qcow2 and ISO disk images for both variants
-- **Daily rebuilds** — Cron schedule keeps packages fresh
 
 ## Colors
 
