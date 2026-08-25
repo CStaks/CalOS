@@ -168,25 +168,9 @@ jobs:
 
           # SourceForge FRS has no 2 GiB per-asset limit like GitHub Releases
           # (files up to 10 GB replicate to mirrors), so full images are
-          # uploaded directly. The file browser also shows this README.
-          cat > dist/README.txt <<'EOF'
-          CalOS disk images
-          =================
-
-          - standard — AMD / Intel GPUs (disk.qcow2 for VMs, install.iso for USB/installer)
-          - nvidia — NVIDIA GPUs (disk.qcow2 for VMs, install.iso for USB/installer)
-
-          Verify any download with:
-
-            sha256sum --check SHA256SUMS.txt
-
-          Files are replaced on every build, so these download links stay the same.
-          EOF
-
-          # Checksums for every published file, written with paths relative to
-          # dist/ so users can download everything into one folder and run
-          # `sha256sum --check SHA256SUMS.txt` there.
-          (cd dist && find . -maxdepth 1 -type f ! -name SHA256SUMS.txt -exec sha256sum {} + > SHA256SUMS.txt)
+          # uploaded directly. SourceForge generates MD5/SHA1/SHA256 checksums
+          # for every file on the files page, so no checksum/README files are
+          # uploaded.
 
           # Drop the old auto-generated GitHub release; SourceForge is now home.
           gh release delete continuous --yes --cleanup-tag 2>/dev/null || true

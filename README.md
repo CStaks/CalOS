@@ -44,7 +44,7 @@ Prebuilt qcow2 (VMs) and anaconda-iso (USB/installer) images are built daily and
 - **standard** — AMD / Intel GPUs
 - **nvidia** — NVIDIA GPUs
 
-Verify any download with the published `SHA256SUMS.txt` (`sha256sum --check SHA256SUMS.txt`).
+SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page, so you can verify any download there.
 
 ## What's Included
 

@@ -52,13 +52,13 @@ artifacts (`disk-images-<variant>-<type>`, no retention limit).
 **Release job** (skipped on PR; gated on `create-release` for manual runs):
 downloads all `disk-images-*` artifacts, copies real disk files into `dist/`
 prefixed with variant (e.g. `standard-disk.qcow2`, `nvidia-install.iso`),
-**skips `*.json`**, writes a `README.txt` + `SHA256SUMS.txt` (checksum paths are
-relative so `sha256sum --check SHA256SUMS.txt` works from the download folder),
-deletes the stale `continuous` GitHub release, and **rsyncs everything to the
-SourceForge project files** (`/home/frs/project/calos-linux/` as user
-`callenflynn`, key from the `SOURCEFORGE_SSH_KEY` repo secret). GitHub's 2 GiB
-per-asset release limit was the original blocker; SourceForge FRS accepts files
-up to 10 GiB, so the multi-GB images upload whole — no splitting needed.
+**skips `*.json`**, deletes the stale `continuous` GitHub release, and
+**rsyncs the images to the SourceForge project files**
+(`/home/frs/project/calos-linux/` as user `callenflynn`, key from the
+`SOURCEFORGE_SSH_KEY` repo secret). No checksum/README files are uploaded —
+SourceForge's files page generates MD5/SHA1/SHA256 checksums per file. GitHub's
+2 GiB per-asset release limit was the original blocker; SourceForge FRS accepts
+files up to 10 GiB, so the multi-GB images upload whole — no splitting needed.
 
 ## Quality & dependency bots
 
