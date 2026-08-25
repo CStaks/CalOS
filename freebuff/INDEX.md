@@ -14,8 +14,8 @@
   `sudo bootc switch ghcr.io/callenflynn/calos:latest`.
 - **How it's built:** a single `Containerfile` + `build_files/build.sh`, driven by
   `Justfile` recipes, built daily in GitHub Actions and signed with Cosign.
-- **Disk images:** qcow2 (VM) and anaconda-iso (installer) built daily via
-  bootc-image-builder and published to SourceForge
+- **Disk images:** qcow2 + vmdk (VM) and anaconda-iso (installer) built daily
+  via bootc-image-builder and published to SourceForge
   (https://sourceforge.net/projects/calos-linux/).
 - **License:** Apache-2.0.
 - **Repo size:** 54 tracked files (mostly text config + branding assets).

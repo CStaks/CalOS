@@ -38,7 +38,8 @@ Triggers: on completion of `Build container image` on `main` · daily cron
 workflow itself · `workflow_dispatch` with `create-release` (bool) and
 `platform` (amd64/arm64, arm64 → `ubuntu-24.04-arm` runners).
 
-**Matrix:** variant (standard / nvidia) × disk-type (`qcow2` / `anaconda-iso`).
+**Matrix:** variant (standard / nvidia) × disk-type (`qcow2` / `anaconda-iso`,
+plus `vmdk` for the standard variant only — VMware).
 
 Flow: prepare env → checkout → **`osbuild/bootc-image-builder-action`** with:
 - `config-file`: `disk_config/iso-gnome.toml` for `anaconda-iso`, else
@@ -53,7 +54,7 @@ artifacts (`disk-images-<variant>-<type>`, no retention limit).
 downloads all `disk-images-*` artifacts, copies real disk files into `dist/`
 prefixed with variant (e.g. `standard-disk.qcow2`, `nvidia-install.iso`),
 **skips `*.json`**, writes a short `README.txt` (shown on the files page)
-explaining what each of the four images is, deletes the stale `continuous`
+explaining what each of the five images is, deletes the stale `continuous`
 GitHub release, and **rsyncs the images to the SourceForge project files**
 (`/home/frs/project/calos-linux/` as user `callenflynn`, key from the
 `SOURCEFORGE_SSH_KEY` repo secret). No checksum file is uploaded — SourceForge's

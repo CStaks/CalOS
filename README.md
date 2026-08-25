@@ -39,10 +39,10 @@ Reboot to apply. Updates are automatic — `bootc` checks for new images in the 
 
 ## Disk images
 
-Prebuilt qcow2 (VMs) and anaconda-iso (USB/installer) images are built daily and published automatically to the [SourceForge project files](https://sourceforge.net/projects/calos-linux/):
+Prebuilt qcow2 + vmdk (VMs) and anaconda-iso (USB/installer) images are built daily and published automatically to the [SourceForge project files](https://sourceforge.net/projects/calos-linux/):
 
-- **standard** — AMD / Intel GPUs
-- **nvidia** — NVIDIA GPUs
+- **standard** — AMD / Intel GPUs (qcow2 for QEMU/Boxes, vmdk for VMware, installer ISO)
+- **nvidia** — NVIDIA GPUs (qcow2, installer ISO)
 
 SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page, so you can verify any download there.
 

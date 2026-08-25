@@ -53,7 +53,11 @@ jobs:
             suffix: ""
           - name: nvidia
             suffix: "-nvidia"
-        disk-type: ["qcow2", "anaconda-iso"]
+        disk-type: ["qcow2", "anaconda-iso", "vmdk"]
+        exclude:
+          - variant:
+              name: nvidia
+            disk-type: vmdk
     permissions:
       contents: read
       packages: read
@@ -175,12 +179,14 @@ jobs:
           CalOS disk images
           =================
 
-          - standard-disk.qcow2 — VM disk image (AMD / Intel GPUs)
-          - nvidia-disk.qcow2 — VM disk image (NVIDIA GPUs)
+          - standard-disk.qcow2 — VM disk image for QEMU/Boxes (AMD / Intel GPUs)
+          - standard-disk.vmdk — VMware disk image (AMD / Intel GPUs)
+          - nvidia-disk.qcow2 — VM disk image for QEMU/Boxes (NVIDIA GPUs)
           - standard-install.iso — USB/installer image (AMD / Intel GPUs)
           - nvidia-install.iso — USB/installer image (NVIDIA GPUs)
 
-          qcow2 files are for virtual machines; ISO files are bootable
+          qcow2 and vmdk files are for virtual machines (qcow2 for
+          QEMU/Boxes, vmdk for VMware); ISO files are bootable
           USB/installer media. See the project README for install steps.
           EOF
 
