@@ -142,16 +142,24 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
+          # Artifacts nest the actual disk images under a type dir
+          # (e.g. qcow2/disk.qcow2, bootiso/install.iso) — flatten them and
+          # prefix each file with its variant (standard / nvidia).
           for artifact in release/disk-images-*; do
             [ -d "$artifact" ] || continue
             variant=$(basename "$artifact" | sed 's/^disk-images-\([^-]*\)-.*/\1/')
-            for file in "$artifact"/*; do
-              [ -f "$file" ] || continue
+            while IFS= read -r -d '' file; do
               # Skip JSON manifest files — only publish actual disk images
-              [[ "$file" == *.json ]] && continue
+              case "$file" in
+                *.json) continue ;;
+              esac
               cp "$file" "dist/${variant}-$(basename "$file")"
-            done
+            done < <(find "$artifact" -type f -print0)
           done
+          if ! ls dist/* >/dev/null 2>&1; then
+            echo "::error::No disk image files found to publish" >&2
+            exit 1
+          fi
           gh release delete continuous --yes 2>/dev/null || true
           NOTES=$(printf 'Latest CalOS disk images.\n\n- **standard** — AMD / Intel GPUs\n- **nvidia** — NVIDIA GPUs\n\nqcow2 files are for VMs, anaconda-iso files are for USB/installer media. This release is replaced on every build, so these download links stay the same.')
           gh release create continuous dist/* \
