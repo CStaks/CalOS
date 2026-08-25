@@ -13,7 +13,7 @@ A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bl
 | `:latest` | `ghcr.io/ublue-os/bluefin:stable` | AMD / Intel |
 | `:latest-nvidia` | `ghcr.io/ublue-os/bluefin-nvidia-open:stable` | NVIDIA (open drivers) |
 
-Both variants are built daily via GitHub Actions and pushed to GHCR.
+Both variants are built daily via GitHub Actions and pushed to Sourceforge.
 
 # Install
 
