@@ -17,6 +17,12 @@ Both variants are built daily via GitHub Actions and pushed to GHCR.
 
 ## Install
 
+### Download
+
+Download the Qwoc2 or ISO files from [Sourceforge](https://sourceforge.net/projects/calos-linux/)
+
+
+### Bootc
 From any bootc-based system (Bluefin, Bazzite, Aurora, Fedora Atomic):
 
 ```bash
