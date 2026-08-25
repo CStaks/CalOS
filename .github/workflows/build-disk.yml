@@ -169,8 +169,20 @@ jobs:
           # SourceForge FRS has no 2 GiB per-asset limit like GitHub Releases
           # (files up to 10 GB replicate to mirrors), so full images are
           # uploaded directly. SourceForge generates MD5/SHA1/SHA256 checksums
-          # for every file on the files page, so no checksum/README files are
-          # uploaded.
+          # for every file on the files page, and this README is shown there to
+          # explain what each file is.
+          cat > dist/README.txt <<'EOF'
+          CalOS disk images
+          =================
+
+          - standard-disk.qcow2 — VM disk image (AMD / Intel GPUs)
+          - nvidia-disk.qcow2 — VM disk image (NVIDIA GPUs)
+          - standard-install.iso — USB/installer image (AMD / Intel GPUs)
+          - nvidia-install.iso — USB/installer image (NVIDIA GPUs)
+
+          qcow2 files are for virtual machines; ISO files are bootable
+          USB/installer media. See the project README for install steps.
+          EOF
 
           # Drop the old auto-generated GitHub release; SourceForge is now home.
           gh release delete continuous --yes --cleanup-tag 2>/dev/null || true
