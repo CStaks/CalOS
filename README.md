@@ -76,4 +76,6 @@ SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page
 |------|-----|
 | Primary accent | `#FF3B00` |
 | Background | `#050505` |
+| Background 2 | `#ffeee9` |
 | Text | `#E0E0E0` |
+| Text 2 | `#050505` |
