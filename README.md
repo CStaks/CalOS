@@ -33,10 +33,12 @@ Reboot to apply. Updates are automatic — `bootc` checks for new images in the 
 
 ## Disk images
 
-Prebuilt qcow2 (VMs) and anaconda-iso (USB/installer) images are built daily and published automatically to the [latest release](https://github.com/callenflynn/calos/releases/tag/continuous):
+Prebuilt qcow2 (VMs) and anaconda-iso (USB/installer) images are built daily and published automatically to the [SourceForge project files](https://sourceforge.net/projects/calos-linux/):
 
 - **standard** — AMD / Intel GPUs
 - **nvidia** — NVIDIA GPUs
+
+Verify any download with the published `SHA256SUMS.txt` (`sha256sum --check SHA256SUMS.txt`).
 
 ## What's Included
 

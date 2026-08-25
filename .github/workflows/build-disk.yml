@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
     inputs:
       create-release:
-        description: "Create a GitHub Release with download links"
+        description: "Publish disk images to SourceForge"
         required: false
         default: true
         type: boolean
@@ -119,7 +119,7 @@ jobs:
           overwrite: true
 
   release:
-    name: Publish GitHub Release
+    name: Publish to SourceForge
     needs: build
     if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.create-release == true)
     runs-on: ubuntu-24.04
@@ -135,34 +135,76 @@ jobs:
           path: release
           pattern: disk-images-*
 
-      - name: Create release
+      - name: Publish to SourceForge
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          SOURCEFORGE_SSH_KEY: ${{ secrets.SOURCEFORGE_SSH_KEY }}
         run: |
           set -euo pipefail
           mkdir -p dist
+
           # Artifacts nest the actual disk images under a type dir
           # (e.g. qcow2/disk.qcow2, bootiso/install.iso) — flatten them and
           # prefix each file with its variant (standard / nvidia).
+          found_image=false
           for artifact in release/disk-images-*; do
             [ -d "$artifact" ] || continue
             variant=$(basename "$artifact" | sed 's/^disk-images-\([^-]*\)-.*/\1/')
             while IFS= read -r -d '' file; do
-              # Skip JSON manifest files — only publish actual disk images
+              # Skip JSON manifest files — only publish actual disk images.
               case "$file" in
                 *.json) continue ;;
               esac
+              found_image=true
               cp "$file" "dist/${variant}-$(basename "$file")"
             done < <(find "$artifact" -type f -print0)
           done
-          if ! ls dist/* >/dev/null 2>&1; then
+
+          if [[ "$found_image" != true ]]; then
             echo "::error::No disk image files found to publish" >&2
             exit 1
           fi
-          gh release delete continuous --yes 2>/dev/null || true
-          NOTES=$(printf 'Latest CalOS disk images.\n\n- **standard** — AMD / Intel GPUs\n- **nvidia** — NVIDIA GPUs\n\nqcow2 files are for VMs, anaconda-iso files are for USB/installer media. This release is replaced on every build, so these download links stay the same.')
-          gh release create continuous dist/* \
-            --title "Latest disk images" \
-            --notes "$NOTES"
 
+          # SourceForge FRS has no 2 GiB per-asset limit like GitHub Releases
+          # (files up to 10 GB replicate to mirrors), so full images are
+          # uploaded directly. The file browser also shows this README.
+          cat > dist/README.txt <<'EOF'
+          CalOS disk images
+          =================
+
+          - standard — AMD / Intel GPUs (disk.qcow2 for VMs, install.iso for USB/installer)
+          - nvidia — NVIDIA GPUs (disk.qcow2 for VMs, install.iso for USB/installer)
+
+          Verify any download with:
+
+            sha256sum --check SHA256SUMS.txt
+
+          Files are replaced on every build, so these download links stay the same.
+          EOF
+
+          # Checksums for every published file, written with paths relative to
+          # dist/ so users can download everything into one folder and run
+          # `sha256sum --check SHA256SUMS.txt` there.
+          (cd dist && find . -maxdepth 1 -type f ! -name SHA256SUMS.txt -exec sha256sum {} + > SHA256SUMS.txt)
+
+          # Drop the old auto-generated GitHub release; SourceForge is now home.
+          gh release delete continuous --yes --cleanup-tag 2>/dev/null || true
+
+          if [[ -z "$SOURCEFORGE_SSH_KEY" ]]; then
+            echo "::error::SOURCEFORGE_SSH_KEY secret is not set" >&2
+            exit 1
+          fi
+
+          # Upload over rsync to the SourceForge project's FRS directory.
+          # (SourceForge recommends rsync for files over 100 MB — it can resume.)
+          if ! command -v rsync >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y rsync
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SOURCEFORGE_SSH_KEY" > ~/.ssh/sourceforge_key
+          chmod 600 ~/.ssh/sourceforge_key
+          rsync -av --partial \
+            -e "ssh -i $HOME/.ssh/sourceforge_key -o StrictHostKeyChecking=accept-new" \
+            dist/ callenflynn@frs.sourceforge.net:/home/frs/project/calos-linux/
