@@ -15,14 +15,14 @@ A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bl
 
 Both variants are built daily via GitHub Actions and pushed to GHCR.
 
-## Install
+# Install
 
-### Download
+## Download
 
 Download the Qwoc2 or ISO files from [Sourceforge](https://sourceforge.net/projects/calos-linux/)
 
 
-### Bootc
+## Bootc
 From any bootc-based system (Bluefin, Bazzite, Aurora, Fedora Atomic):
 
 ```bash
