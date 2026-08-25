@@ -1,0 +1,38 @@
+calos:
+  - changed-files:
+      - any-glob-to-any-file: 'CalOS/**'
+
+build:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'build_files/**'
+          - 'Justfile'
+          - 'image-template.env'
+
+disk-image:
+  - changed-files:
+      - any-glob-to-any-file: 'disk_config/**'
+
+system:
+  - changed-files:
+      - any-glob-to-any-file: 'system_files/**'
+
+freebuff:
+  - changed-files:
+      - any-glob-to-any-file: 'freebuff/**'
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: '.github/**'
+
+container:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'Containerfile'
+          - '.hadolint.yaml'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'README.md'
+          - '**/*.md'
