@@ -37,7 +37,7 @@ body {
 .logo-svg {
     width: 140px; 
     height: auto;
-    margin-right: -10px; 
+    margin-right: 5px; 
 }
 
 .logo-text {
@@ -48,7 +48,6 @@ body {
     letter-spacing: -2px;
 }
 
-/* Typography */
 .description {
     font-weight: 400;
     font-size: 1.5rem;
