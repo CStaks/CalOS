@@ -9,6 +9,12 @@ COPY system_files /system_files
 
 FROM ${BASE_IMAGE}
 
+# Optional release metadata stamped into os-release by build.sh on versioned
+# builds (e.g. tag v1.2.0 -> VERSION="1.2 (Superior)"). Left empty on rolling
+# builds, where the committed system_files/usr/lib/os-release is used as-is.
+ARG CALOS_VERSION=""
+ARG CALOS_CODENAME=""
+
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:testing
 # FROM ghcr.io/ublue-os/aurora:stable

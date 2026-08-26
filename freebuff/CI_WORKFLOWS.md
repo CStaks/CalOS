@@ -42,10 +42,23 @@ release, e.g. `v1.2.0`) · PR touching `disk_config/*` or the workflow itself ·
 **Matrix:** variant (standard / nvidia) × disk-type (`qcow2` / `anaconda-iso`,
 plus `vmdk` for the standard variant only — VMware).
 
+**Versioned container images job** (`build-versioned-images`, **tag runs
+only**): before the disk matrix, builds both CalOS variants with the release
+version + codename stamped into `os-release` and pushes them to GHCR as
+`ghcr.io/<owner>/calos:v1.2.0` / `:v1.2.0-nvidia`. The minor version →
+codename map lives in `build_files/codenames.sh` (1→Huron, 2→Superior,
+3→Eerie…); an unmapped minor fails the run with a clear error. The stamping
+is done by `build.sh` (build args `CALOS_VERSION` / `CALOS_CODENAME` declared
+in the Containerfile), overriding only `VERSION` and `PRETTY_NAME` —
+`VERSION_ID` stays Fedora's so bootc-image-builder keeps accepting it. This
+is what `bootc switch ghcr.io/callenflynn/calos:v1.2.0` users get.
+
 Flow: prepare env → checkout → **`osbuild/bootc-image-builder-action`** with:
 - `config-file`: `disk_config/iso-gnome.toml` for `anaconda-iso`, else
   `disk_config/disk.toml`
-- `image`: `ghcr.io/<owner>/calos:latest` / `:latest-nvidia` (the just-built image)
+- `image`: `ghcr.io/<owner>/calos:latest` / `:latest-nvidia` on rolling runs,
+  or `ghcr.io/<owner>/calos:v1.2.0` / `:v1.2.0-nvidia` on tag runs (the image
+  pushed by the `build-versioned-images` job, gated via `needs`)
 - `types`: the matrix disk type, `--use-librepo=True --rootfs btrfs`
 
 → delete the action's manifest `*.json` files from output (recent fix) → upload
@@ -71,10 +84,12 @@ upload whole — no splitting needed.
   `--ignore-existing` and `--partial-dir` — versioned files are write-once,
   reruns fill gaps but never overwrite or delete a release's files, and no
   `--delete` is used. Only then is the GitHub Release for that tag
-  created (or edited if it already exists) with a notes section containing
-  direct SourceForge download links for **this** version, clearly separating
-  Standard (AMD/Intel) from NVIDIA. If any upload fails, `set -euo pipefail`
-  fails the job before the release is published.
+  created (or edited if it already exists) titled `CalOS Linux 1.2.0
+  (Superior)` (codename from `build_files/codenames.sh`) with a notes
+  section containing direct SourceForge download links for **this** version
+  and the matching `bootc switch ghcr.io/callenflynn/calos:v1.2.0` image
+  tag, clearly separating Standard (AMD/Intel) from NVIDIA. If any upload
+  fails, `set -euo pipefail` fails the job before the release is published.
 - **Non-tag run (schedule / dispatch)** → rolling "latest" channel: rsync
   `dist/` (including `README.txt`) to the SourceForge project root, and
   delete the stale `continuous` GitHub release.

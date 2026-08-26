@@ -32,7 +32,12 @@ Ghostty, Neovim+LazyVim, starship), and overlays `system_files/` onto `/` (the
 CalOS brand layer: os-release, GRUB, Plymouth, GDM, wallpapers, dock, shell
 prompt). Images are rechunked with rpm-ostree for smaller deltas, tagged, pushed
 to GHCR, and signed. A second workflow (`build-disk.yml`) turns the container
-images into qcow2/ISO artifacts with bootc-image-builder.
+images into qcow2/ISO artifacts with bootc-image-builder. On a `v*` tag push,
+`build-disk.yml` first builds versioned container images
+(`ghcr.io/<owner>/calos:v1.2.0[-nvidia]`) with the release codename (from
+`build_files/codenames.sh`) stamped into os-release, then builds the disk
+images from those same versioned images — so both bootc users and ISO/VM
+releases get e.g. "CalOS Superior".
 
 ## Directory Map
 
@@ -58,7 +63,8 @@ images into qcow2/ISO artifacts with bootc-image-builder.
 │       ├── hadolint.yml           # Containerfile lint│   └── renovate-automerge.yml # Shared Renovate auto-merge trigger
 │
 ├── build_files/
-│   └── build.sh                   # THE install/branding script (runs in image build)
+│   ├── build.sh                   # THE install/branding script (runs in image build; stamps release codename when CALOS_VERSION/CODENAME args set)
+│   └── codenames.sh               # minor version → release codename map (1=Huron, 2=Superior, 3=Eerie)
 │
 ├── disk_config/
 │   ├── disk.toml                  # qcow2/raw: / min 20 GiB

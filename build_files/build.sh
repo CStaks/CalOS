@@ -63,6 +63,16 @@ cp -avf "/ctx/system_files"/. /
 # Compile GSettings schemas so our wallpaper/favorites override takes effect
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 
+### Stamp release version/codename into os-release (versioned builds only)
+# Rolling builds keep the committed os-release as-is. Versioned builds pass
+# CALOS_VERSION / CALOS_CODENAME (from a git tag like v1.2.0) and override only
+# VERSION and PRETTY_NAME — VERSION_ID stays Fedora's so bootc-image-builder
+# keeps accepting the file.
+if [[ -n "${CALOS_VERSION:-}" && -n "${CALOS_CODENAME:-}" ]]; then
+    sed -i "s/^VERSION=.*/VERSION=\"${CALOS_VERSION} (${CALOS_CODENAME})\"/" /usr/lib/os-release
+    sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"CalOS ${CALOS_CODENAME}\"/" /usr/lib/os-release
+fi
+
 ### Activate CalOS Plymouth boot theme
 # Set CalOS as the default Plymouth theme
 plymouth-set-default-theme calos 2>/dev/null || true

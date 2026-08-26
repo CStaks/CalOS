@@ -45,8 +45,84 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # On tag runs (v*), build the CalOS container images with the release
+  # codename stamped into os-release and push them as versioned tags
+  # (ghcr.io/<owner>/calos:v1.2.0 / :v1.2.0-nvidia) — this is what bootc
+  # switch users pull for a release. The disk matrix below then builds from
+  # those same versioned images, so ISO/VM artifacts carry the codename too.
+  build-versioned-images:
+    name: Build versioned container images (${{ matrix.variant.name }})
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        variant:
+          - name: standard
+            suffix: ""
+            base_image: "ghcr.io/ublue-os/bluefin:stable"
+          - name: nvidia
+            suffix: "-nvidia"
+            base_image: "ghcr.io/ublue-os/bluefin-nvidia-open:stable"
+    env:
+      IMAGE_NAME: ${{ github.event.repository.name }}
+      IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Maximize build space
+        uses: ublue-os/remove-unwanted-software@695eb75bc387dbcd9685a8e72d23439d8686cba6
+
+      - name: Install just
+        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 #v4.0.0
+
+      - name: Compute version and codename
+        shell: bash
+        run: |
+          set -euo pipefail
+          source build_files/codenames.sh
+          REF_NAME="${{ github.ref_name }}"
+          VERSION="${REF_NAME#v}"
+          MINOR="${VERSION%.*}"
+          MINOR_NUM="${MINOR##*.}"
+          CODENAME="$(calos_codename "${MINOR_NUM}")"
+          if [[ -z "$CODENAME" ]]; then
+            echo "::error::No codename mapped for minor ${MINOR_NUM} (tag ${REF_NAME}) — add it to build_files/codenames.sh" >&2
+            exit 1
+          fi
+          echo "IMAGE_NAME=${IMAGE_NAME,,}" >> "$GITHUB_ENV"
+          echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> "$GITHUB_ENV"
+          echo "CALOS_VERSION=${MINOR}" >> "$GITHUB_ENV"
+          echo "CALOS_CODENAME=${CODENAME}" >> "$GITHUB_ENV"
+          echo "VERSION_TAG=${REF_NAME}${{ matrix.variant.suffix }}" >> "$GITHUB_ENV"
+
+      - name: Build versioned image
+        run: |
+          sudo -E $(command -v just) build \
+            "${IMAGE_NAME}" \
+            "${VERSION_TAG}" \
+            "BASE_IMAGE=${{ matrix.variant.base_image }} CALOS_VERSION=${CALOS_VERSION} CALOS_CODENAME=${CALOS_CODENAME}"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@abd2ef45e78c5afb21d64d4ca52ee8550d9572c7 # v4.5.1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push versioned image to GHCR
+        run: |
+          set -euo pipefail
+          sudo -E podman push "${IMAGE_NAME}:${VERSION_TAG}" "${IMAGE_REGISTRY}/${IMAGE_NAME}:${VERSION_TAG}"
+
   build:
     name: Build disk images (${{ matrix.variant.name }})
+    needs: build-versioned-images
+    if: ${{ needs.build-versioned-images.result == 'success' || needs.build-versioned-images.result == 'skipped' }}
     runs-on: ${{ (inputs.platform || 'amd64') == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     strategy:
       fail-fast: false
@@ -73,8 +149,14 @@ jobs:
           USER_GID=$(id -g)
           # Concatenate the types with a hyphen
           DISK_TYPE=$(echo "${{ matrix.disk-type }}" | tr ' ' '-')
-          # Build the full tag with variant suffix (e.g. "latest" or "latest-nvidia")
-          DEFAULT_TAG="${{ env.BASE_TAG }}${{ matrix.variant.suffix }}"
+          # Build the full tag with variant suffix — "latest" / "latest-nvidia"
+          # on rolling builds, or "v1.2.0" / "v1.2.0-nvidia" on versioned tag
+          # runs (the image pushed by the build-versioned-images job).
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            DEFAULT_TAG="${{ github.ref_name }}${{ matrix.variant.suffix }}"
+          else
+            DEFAULT_TAG="${{ env.BASE_TAG }}${{ matrix.variant.suffix }}"
+          fi
           # Lowercase the image uri
           echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
           echo "IMAGE_NAME=${IMAGE_NAME,,}" >> ${GITHUB_ENV}
@@ -228,6 +310,16 @@ jobs:
             REF_NAME="${{ github.ref_name }}"
             VERSION="${REF_NAME#v}"
 
+            # Release codename for the title/notes — same map the versioned
+            # container build used to stamp os-release.
+            source build_files/codenames.sh
+            MINOR="${VERSION%.*}"
+            CODENAME="$(calos_codename "${MINOR##*.}")"
+            RELEASE_TITLE="CalOS Linux ${VERSION}"
+            if [[ -n "${CODENAME}" ]]; then
+              RELEASE_TITLE="${RELEASE_TITLE} (${CODENAME})"
+            fi
+
             # A release is only published once all five images are present.
             expected=(standard-install.iso standard-disk.qcow2 standard-disk.vmdk \
                       nvidia-install.iso nvidia-disk.qcow2)
@@ -245,9 +337,11 @@ jobs:
 
           SF_URL="https://sourceforge.net/projects/calos-linux/files/$VERSION"
           NOTES=$(cat <<EOF
-          ## CalOS Linux $VERSION
+          ## $RELEASE_TITLE
 
           Disk images are hosted on [SourceForge]($SF_URL).
+
+          **Container images:** \`bootc switch ghcr.io/callenflynn/calos:${REF_NAME}\` (or \`:${REF_NAME}-nvidia\` for NVIDIA hardware).
 
           ### Standard (AMD / Intel GPUs) — recommended for most users
 
@@ -268,10 +362,10 @@ jobs:
 
             if gh release view "$REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
               gh release edit "$REF_NAME" --repo "$GITHUB_REPOSITORY" \
-                --title "CalOS Linux $VERSION" --notes "$NOTES"
+                --title "$RELEASE_TITLE" --notes "$NOTES"
             else
               gh release create "$REF_NAME" --repo "$GITHUB_REPOSITORY" \
-                --title "CalOS Linux $VERSION" --notes "$NOTES"
+                --title "$RELEASE_TITLE" --notes "$NOTES"
             fi
           else
             # Drop the stale auto-generated GitHub release from the old flow.

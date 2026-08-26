@@ -12,14 +12,17 @@ A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bl
 |-----|-----------|-----|
 | `:latest` | `ghcr.io/ublue-os/bluefin:stable` | AMD / Intel |
 | `:latest-nvidia` | `ghcr.io/ublue-os/bluefin-nvidia-open:stable` | NVIDIA (open drivers) |
+| `:vX.Y.Z` / `:vX.Y.Z-nvidia` | released on each `v*` tag | matching variant |
 
-Both variants are built daily via GitHub Actions and pushed to Sourceforge.
+Both variants are built daily via GitHub Actions and pushed to Sourceforge. Tagged releases (e.g. `v1.2.0`) also publish versioned images (`:v1.2.0` / `:v1.2.0-nvidia`) with the release codename baked in.
 
 # Install
 
 ## Download
 
 Releases are indexed on the [GitHub Releases](https://github.com/callenflynn/calos/releases) page, with the actual image files hosted on [SourceForge](https://sourceforge.net/projects/calos-linux/files/). Each release tag (e.g. `v1.2.0`) is published to its own SourceForge folder (`/1.2.0/`) so older releases stay downloadable.
+
+Every minor version has a codename — v1.1 is **CalOS Huron**, v1.2 is **CalOS Superior**, v1.3 is **CalOS Eerie** — shown in the installed system (Settings → About, GRUB, fastfetch) for both the disk images and the `:vX.Y.Z` container images.
 
 - **standard** — AMD / Intel GPUs (recommended)
 - **nvidia** — NVIDIA GPUs only
@@ -36,6 +39,13 @@ For NVIDIA GPUs:
 
 ```bash
 sudo bootc switch ghcr.io/callenflynn/calos:latest-nvidia
+```
+
+To pin a specific release instead of the rolling `latest`:
+
+```bash
+sudo bootc switch ghcr.io/callenflynn/calos:v1.2.0          # standard
+sudo bootc switch ghcr.io/callenflynn/calos:v1.2.0-nvidia   # NVIDIA
 ```
 
 Reboot to apply. Updates are automatic — `bootc` checks for new images in the background and stages them for the next reboot.

@@ -26,6 +26,8 @@ FROM scratch AS ctx                               # context only, not shipped
 COPY build_files /
 COPY system_files /system_files
 FROM ${BASE_IMAGE}
+ARG CALOS_VERSION=""                              # optional release metadata (tag builds only)
+ARG CALOS_CODENAME=""                             # e.g. v1.2.0 -> VERSION="1.2 (Superior)"
 RUN rm -rf /opt && mkdir /opt                     # make /opt immutable (package safety)
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/cache \
@@ -62,7 +64,13 @@ Runs as root inside the base image. Order matters; summarized:
    `LazyVim/starter` into `/etc/skel/.config/nvim` (strips `.git`) so every new
    user gets LazyVim preloaded.
 7. **Overlay branding:** `cp -avf /ctx/system_files/. /` then
-   `glib-compile-schemas` (activates `90_calos.gschema.override`).
+   `glib-compile-schemas` (activates `90_calos.gschema.override`). On
+   versioned builds (when the `CALOS_VERSION` / `CALOS_CODENAME` build args are
+   set, e.g. from a `v1.2.0` tag) `build.sh` then overrides only `VERSION` and
+   `PRETTY_NAME` in `/usr/lib/os-release` — `VERSION="1.2 (Superior)"`,
+   `PRETTY_NAME="CalOS Superior"` — leaving `VERSION_ID` as Fedora's so
+   bootc-image-builder keeps accepting the file. Rolling builds leave the
+   committed os-release untouched.
 8. **Plymouth:** `plymouth-set-default-theme calos`, with a
    `/etc/plymouth/plymouthd.conf` fallback.
 9. **Starship init** for bash via `/etc/profile.d/calos.sh`.
