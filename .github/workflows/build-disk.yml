@@ -8,6 +8,9 @@ on:
     branches: [main]
   schedule:
     - cron: '15 11 * * *'  # 11:15am UTC, after the daily container build
+  push:
+    tags:
+      - 'v*'  # versioned release: v1.2.0 -> SourceForge /1.2.0/ + GitHub Release
   pull_request:
     branches:
       - main
@@ -123,7 +126,7 @@ jobs:
           overwrite: true
 
   release:
-    name: Publish to SourceForge
+    name: Publish disk images (SourceForge + GitHub Release)
     needs: build
     if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.create-release == true)
     runs-on: ubuntu-24.04
@@ -139,7 +142,7 @@ jobs:
           path: release
           pattern: disk-images-*
 
-      - name: Publish to SourceForge
+      - name: Publish disk images
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -173,8 +176,8 @@ jobs:
           # SourceForge FRS has no 2 GiB per-asset limit like GitHub Releases
           # (files up to 10 GB replicate to mirrors), so full images are
           # uploaded directly. SourceForge generates MD5/SHA1/SHA256 checksums
-          # for every file on the files page, and this README is shown there to
-          # explain what each file is.
+          # for every file on the files page, and this README is shown at the
+          # project root to explain what each file is.
           cat > dist/README.txt <<'EOF'
           CalOS disk images
           =================
@@ -190,9 +193,6 @@ jobs:
           USB/installer media. See the project README for install steps.
           EOF
 
-          # Drop the old auto-generated GitHub release; SourceForge is now home.
-          gh release delete continuous --yes --cleanup-tag 2>/dev/null || true
-
           if [[ -z "$SOURCEFORGE_SSH_KEY" ]]; then
             echo "::error::SOURCEFORGE_SSH_KEY secret is not set" >&2
             exit 1
@@ -207,6 +207,77 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$SOURCEFORGE_SSH_KEY" > ~/.ssh/sourceforge_key
           chmod 600 ~/.ssh/sourceforge_key
-          rsync -av --partial \
-            -e "ssh -i $HOME/.ssh/sourceforge_key -o StrictHostKeyChecking=accept-new" \
-            dist/ callenflynn@frs.sourceforge.net:/home/frs/project/calos-linux/
+          SSH_OPTS="-i $HOME/.ssh/sourceforge_key -o StrictHostKeyChecking=accept-new"
+          SF_BASE="callenflynn@frs.sourceforge.net:/home/frs/project/calos-linux"
+
+          # GitHub Releases is the index page; SourceForge hosts the binaries.
+          #
+          # Tag runs (e.g. v1.2.0) publish a versioned release: the five
+          # images go to a per-version SourceForge directory (/1.2.0/), and
+          # then a GitHub Release is created/updated with direct download
+          # links for THIS version. Versioned files are write-once:
+          # --ignore-existing skips files already uploaded (so a rerun fills
+          # gaps without touching an older release's files) and
+          # --partial-dir keeps interrupted transfers out of the final path
+          # so they get retried instead of being treated as complete. No
+          # --delete is ever used, so nothing is removed remotely.
+          #
+          # Non-tag runs (schedule / dispatch) keep publishing to the project
+          # root as the rolling "latest" channel.
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            REF_NAME="${{ github.ref_name }}"
+            VERSION="${REF_NAME#v}"
+
+            # A release is only published once all five images are present.
+            expected=(standard-install.iso standard-disk.qcow2 standard-disk.vmdk \
+                      nvidia-install.iso nvidia-disk.qcow2)
+            for file in "${expected[@]}"; do
+              if [[ ! -f "dist/$file" ]]; then
+                echo "::error::Cannot publish release: missing dist/$file" >&2
+                exit 1
+              fi
+            done
+
+            rsync -a --partial-dir=.rsync-partial --ignore-existing \
+              -e "ssh $SSH_OPTS" \
+              --exclude README.txt \
+              dist/ "$SF_BASE/$VERSION/"
+
+          SF_URL="https://sourceforge.net/projects/calos-linux/files/$VERSION"
+          NOTES=$(cat <<EOF
+          ## CalOS Linux $VERSION
+
+          Disk images are hosted on [SourceForge]($SF_URL).
+
+          ### Standard (AMD / Intel GPUs) — recommended for most users
+
+          - [standard-install.iso]($SF_URL/standard-install.iso/download) — bootable USB/installer media
+          - [standard-disk.qcow2]($SF_URL/standard-disk.qcow2/download) — QEMU/Boxes VM disk image
+          - [standard-disk.vmdk]($SF_URL/standard-disk.vmdk/download) — VMware VM disk image
+
+          ### NVIDIA (NVIDIA GPUs only)
+
+          Includes the NVIDIA driver stack — do not use on AMD/Intel hardware.
+
+          - [nvidia-install.iso]($SF_URL/nvidia-install.iso/download) — bootable USB/installer media
+          - [nvidia-disk.qcow2]($SF_URL/nvidia-disk.qcow2/download) — QEMU/Boxes VM disk image
+
+          **Standard** is the normal build for AMD/Intel GPUs; **NVIDIA** is only for NVIDIA hardware.
+          EOF
+          )
+
+            if gh release view "$REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              gh release edit "$REF_NAME" --repo "$GITHUB_REPOSITORY" \
+                --title "CalOS Linux $VERSION" --notes "$NOTES"
+            else
+              gh release create "$REF_NAME" --repo "$GITHUB_REPOSITORY" \
+                --title "CalOS Linux $VERSION" --notes "$NOTES"
+            fi
+          else
+            # Drop the stale auto-generated GitHub release from the old flow.
+            gh release delete continuous --yes --cleanup-tag 2>/dev/null || true
+
+            rsync -av --partial \
+              -e "ssh $SSH_OPTS" \
+              dist/ "$SF_BASE/"
+          fi

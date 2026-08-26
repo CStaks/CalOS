@@ -19,7 +19,10 @@ Both variants are built daily via GitHub Actions and pushed to Sourceforge.
 
 ## Download
 
-Download the Qwoc2 or ISO files from [Sourceforge](https://sourceforge.net/projects/calos-linux/)
+Releases are indexed on the [GitHub Releases](https://github.com/callenflynn/calos/releases) page, with the actual image files hosted on [SourceForge](https://sourceforge.net/projects/calos-linux/files/). Each release tag (e.g. `v1.2.0`) is published to its own SourceForge folder (`/1.2.0/`) so older releases stay downloadable.
+
+- **standard** — AMD / Intel GPUs (recommended)
+- **nvidia** — NVIDIA GPUs only
 
 
 ## Bootc
@@ -44,7 +47,7 @@ Prebuilt qcow2 + vmdk (VMs) and anaconda-iso (USB/installer) images are built da
 - **standard** — AMD / Intel GPUs (qcow2 for QEMU/Boxes, vmdk for VMware, installer ISO)
 - **nvidia** — NVIDIA GPUs (qcow2, installer ISO)
 
-SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page, so you can verify any download there.
+Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/callenflynn/calos/releases); daily builds keep refreshing the project root as the latest channel. SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page, so you can verify any download there.
 
 ## What's Included
 

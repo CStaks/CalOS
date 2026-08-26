@@ -34,9 +34,10 @@ PR builds validate but never publish.
 ## `.github/workflows/build-disk.yml` — qcow2 + anaconda-iso + release
 
 Triggers: on completion of `Build container image` on `main` · daily cron
-`15 11 * * *` (after the image build) · PR touching `disk_config/*` or the
-workflow itself · `workflow_dispatch` with `create-release` (bool) and
-`platform` (amd64/arm64, arm64 → `ubuntu-24.04-arm` runners).
+`15 11 * * *` (after the image build) · push of a `v*` tag (versioned
+release, e.g. `v1.2.0`) · PR touching `disk_config/*` or the workflow itself ·
+`workflow_dispatch` with `create-release` (bool) and `platform`
+(amd64/arm64, arm64 → `ubuntu-24.04-arm` runners).
 
 **Matrix:** variant (standard / nvidia) × disk-type (`qcow2` / `anaconda-iso`,
 plus `vmdk` for the standard variant only — VMware).
@@ -53,14 +54,30 @@ artifacts (`disk-images-<variant>-<type>`, no retention limit).
 **Release job** (skipped on PR; gated on `create-release` for manual runs):
 downloads all `disk-images-*` artifacts, copies real disk files into `dist/`
 prefixed with variant (e.g. `standard-disk.qcow2`, `nvidia-install.iso`),
-**skips `*.json`**, writes a short `README.txt` (shown on the files page)
-explaining what each of the five images is, deletes the stale `continuous`
-GitHub release, and **rsyncs the images to the SourceForge project files**
-(`/home/frs/project/calos-linux/` as user `callenflynn`, key from the
-`SOURCEFORGE_SSH_KEY` repo secret). No checksum file is uploaded — SourceForge's
-files page generates MD5/SHA1/SHA256 checksums per file. GitHub's 2 GiB
-per-asset release limit was the original blocker; SourceForge FRS accepts files
-up to 10 GiB, so the multi-GB images upload whole — no splitting needed.
+**skips `*.json`**, and writes a short `README.txt` (shown on the files page)
+explaining what each of the five images is. Uploads via rsync to the
+SourceForge project FRS dir (`/home/frs/project/calos-linux/` as user
+`callenflynn`, key from the `SOURCEFORGE_SSH_KEY` repo secret). No checksum
+file is uploaded — SourceForge's files page generates MD5/SHA1/SHA256
+checksums per file. GitHub's 2 GiB per-asset release limit was the original
+blocker; SourceForge FRS accepts files up to 10 GiB, so the multi-GB images
+upload whole — no splitting needed.
+
+**Two publish modes, one job:**
+
+- **Tag run (`vX.Y.Z`)** → versioned release. After verifying all five
+  expected images exist in `dist/`, they are rsynced to a per-version
+  SourceForge directory (`/1.2.0/`, leading `v` stripped) with
+  `--ignore-existing` and `--partial-dir` — versioned files are write-once,
+  reruns fill gaps but never overwrite or delete a release's files, and no
+  `--delete` is used. Only then is the GitHub Release for that tag
+  created (or edited if it already exists) with a notes section containing
+  direct SourceForge download links for **this** version, clearly separating
+  Standard (AMD/Intel) from NVIDIA. If any upload fails, `set -euo pipefail`
+  fails the job before the release is published.
+- **Non-tag run (schedule / dispatch)** → rolling "latest" channel: rsync
+  `dist/` (including `README.txt`) to the SourceForge project root, and
+  delete the stale `continuous` GitHub release.
 
 ## Quality & dependency bots
 

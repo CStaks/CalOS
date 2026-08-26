@@ -53,7 +53,7 @@ images into qcow2/ISO artifacts with bootc-image-builder.
 │   ├── renovate.json5             # Renovate best-practices; automerge pins
 │   └── workflows/
 │       ├── build.yml              # Main CI: build/push/sign both variants daily
-│       ├── build-disk.yml         # qcow2 + anaconda-iso via bootc-image-builder → SourceForge
+│       ├── build-disk.yml         # qcow2/iso/vmdk via bootc-image-builder → SourceForge (+ GitHub Release on v* tags)
 │       ├── codeql.yml             # CodeQL on actions language
 │       ├── hadolint.yml           # Containerfile lint│   └── renovate-automerge.yml # Shared Renovate auto-merge trigger
 │
@@ -98,7 +98,7 @@ images into qcow2/ISO artifacts with bootc-image-builder.
 | VM/ISO image build | `just build-qcow2` / `build-raw` / `build-iso` (bootc-image-builder) |
 | Run a VM | `just run-vm-qcow2` / `spawn-vm` |
 | CI container build + push + sign | `.github/workflows/build.yml` |
-| CI disk image build + publish (SourceForge) | `.github/workflows/build-disk.yml` |
+| CI disk image build + publish (SourceForge; GitHub Release on `v*` tags) | `.github/workflows/build-disk.yml` |
 | Build config (image name, org, tags) | `image-template.env` |
 | Variant parameterization | `ARG BASE_IMAGE` in `Containerfile` + CI matrix |
 
