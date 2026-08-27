@@ -5,7 +5,7 @@
 | Version | Supported          |
 | ------- | ------------------ |
 | v1.1 Huron  | :white_check_mark: |
-| v1.x   | :x:                |
+| v1.x beta  | :x:                |
 
 ## Reporting a Vulnerability
 
