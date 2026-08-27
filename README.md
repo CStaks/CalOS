@@ -14,7 +14,7 @@ A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bl
 | `:latest-nvidia` | `ghcr.io/ublue-os/bluefin-nvidia-open:stable` | NVIDIA (open drivers) |
 | `:vX.Y.Z` / `:vX.Y.Z-nvidia` | released on each `v*` tag | matching variant |
 
-Both variants are built daily via GitHub Actions and pushed to Sourceforge. Tagged releases (e.g. `v1.2.0`) also publish versioned images (`:v1.2.0` / `:v1.2.0-nvidia`) with the release codename baked in.
+Both container variants are built daily via GitHub Actions and pushed to GHCR. Tagged releases (e.g. `v1.2.0`) also publish versioned container images (`:v1.2.0` / `:v1.2.0-nvidia`) with the release codename baked in. The ISO, QCOW2, and VMDK files are hosted on SourceForge.
 
 # Minimum Requirements
 If you do not meet the minimum specs, the operating system may perform poorly and become unstable.
@@ -62,14 +62,24 @@ For NVIDIA GPUs:
 sudo bootc switch ghcr.io/callenflynn/calos:latest-nvidia
 ```
 
+After either switch, update the installed system with:
+
+```bash
+sudo bootc update
+sudo reboot
+```
+
 To pin a specific release instead of the rolling `latest`:
 
 ```bash
-sudo bootc switch ghcr.io/callenflynn/calos:v1.2.0          # standard
-sudo bootc switch ghcr.io/callenflynn/calos:v1.2.0-nvidia   # NVIDIA
+# Standard / AMD / Intel
+sudo bootc switch ghcr.io/callenflynn/calos:v1.1.1
+
+# NVIDIA hardware
+sudo bootc switch ghcr.io/callenflynn/calos:v1.1.1-nvidia
 ```
 
-Reboot to apply. Updates are automatic — `bootc` checks for new images in the background and stages them for the next reboot.
+Reboot to apply. For the rolling channel, `bootc update` checks the selected CalOS `:latest` image and stages updates for the next reboot. Versioned tags such as `:v1.1.1` are pinned and do not move automatically.
 
 ## Disk images
 
