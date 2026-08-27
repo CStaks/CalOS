@@ -16,7 +16,7 @@ A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bl
 
 Both variants are built daily via GitHub Actions and pushed to Sourceforge. Tagged releases (e.g. `v1.2.0`) also publish versioned images (`:v1.2.0` / `:v1.2.0-nvidia`) with the release codename baked in.
 
-## Minimum Requirements
+# Minimum Requirements
 If you do not meet the minimum specs, the operating system may perform poorly and become unstable.
 
 Minimum:
@@ -103,9 +103,15 @@ Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. 
 - **gcc, gcc-c++, make** — Build toolchain
 - **unzip** — Archive extraction
 
+# Screenshots
+
+v1.1.0 desktop
+<img src="CalOS/v1.1.0-desktop-screenshot-1.webp">
+
+
+# Branding
 
 ## Colors
-
 | Role | Hex |
 |------|-----|
 | Primary accent | `#FF3B00` |
@@ -113,3 +119,8 @@ Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. 
 | Background 2 | `#ffeee9` |
 | Text | `#E0E0E0` |
 | Text 2 | `#050505` |
+
+## Logos
+
+primary logo
+<img src="CalOS/CalOS.png">
