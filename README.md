@@ -59,9 +59,8 @@ Storage: 64 GB+
 
 ## Download
 
-Releases are indexed on the [GitHub Releases](https://github.com/callenflynn/calos/releases) page, with the actual image files hosted on [SourceForge](https://sourceforge.net/projects/calos-linux/files/). Each release tag (e.g. `v1.2.0`) is published to its own SourceForge folder (`/1.2.0/`) so older releases stay downloadable.
+Each release tag (e.g. `v1.2.0`) is published to its own SourceForge folder (`/1.2.0/`) 
 
-Every minor version has a codename — v1.1 is **CalOS Huron**, v1.2 is **CalOS Superior**, v1.3 is **CalOS Eerie** — shown in the installed system (Settings → About, GRUB, fastfetch) for both the disk images and the `:vX.Y.Z` container images.
 
 - **standard** — AMD / Intel GPUs (recommended)
 - **nvidia** — NVIDIA GPUs only
