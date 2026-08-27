@@ -19,23 +19,41 @@ Both container variants are built daily via GitHub Actions and pushed to GHCR. T
 # Minimum Requirements
 If you do not meet the minimum specs, the operating system may perform poorly and become unstable.
 
+
 Minimum:
+
+
 Memory:  6gb of ram
+
 CPU (x86_64):  Intel Core i5-8400 or AMD Ryzen 5 2600 or equivalent 
+
 CPU (ARM64): 4-core Cortex-A72-class or equivalent
+
 Storage:  32gb storage
 
+
 Recommended:
+
 Memory:  12gb of ram 
+
 CPU (x86_64):  Intel Core i5-10400 or AMD Ryzen 5 3600 or equivalent
+
 CPU (ARM64): 4-core Cortex-A76-class or equivalent
+
 Storage:  48gb storage
 
+
 Heavy Multitasking or Gaming:
+
+
 Memory:  16gb of ram 
+
 CPU (x86_64):  Intel Core i5-11400 or AMD Ryzen 5 5600 or equivalent
+
 CPU (ARM64):  6+ core Cortex-A76-class or equivalent
+
 Storage: 64 GB+
+
 
 # Install
 
