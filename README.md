@@ -69,10 +69,10 @@ sudo bootc update
 sudo reboot
 ```
 
-To pin a specific release instead of the rolling `latest`:
+To pin a specific release instead of the rolling `latest` (replace v1.1.1 with the version you want to use):
 
 ```bash
-# Standard / AMD / Intel
+# Standard / AMD / Intel 
 sudo bootc switch ghcr.io/callenflynn/calos:v1.1.1
 
 # NVIDIA hardware
