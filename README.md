@@ -16,6 +16,27 @@ A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bl
 
 Both variants are built daily via GitHub Actions and pushed to Sourceforge. Tagged releases (e.g. `v1.2.0`) also publish versioned images (`:v1.2.0` / `:v1.2.0-nvidia`) with the release codename baked in.
 
+## Minimum Requirements
+If you do not meet the minimum specs, the operating system may perform poorly and become unstable.
+
+Minimum:
+Memory:  6gb of ram
+CPU (x86_64):  Intel Core i5-8400 or AMD Ryzen 5 2600 or equivalent 
+CPU (ARM64): 4-core Cortex-A72-class or equivalent
+Storage:  32gb storage
+
+Recommended:
+Memory:  12gb of ram 
+CPU (x86_64):  Intel Core i5-10400 or AMD Ryzen 5 3600 or equivalent
+CPU (ARM64): 4-core Cortex-A76-class or equivalent
+Storage:  48gb storage
+
+Heavy Multitasking or Gaming:
+Memory:  16gb of ram 
+CPU (x86_64):  Intel Core i5-11400 or AMD Ryzen 5 5600 or equivalent
+CPU (ARM64):  6+ core Cortex-A76-class or equivalent
+Storage: 64 GB+
+
 # Install
 
 ## Download
