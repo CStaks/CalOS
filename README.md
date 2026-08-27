@@ -29,7 +29,7 @@ CPU (x86_64):  Intel Core i5-8400 or AMD Ryzen 5 2600 or equivalent
 
 CPU (ARM64): 4-core Cortex-A72-class or equivalent
 
-Storage:  32gb storage
+Storage:  32 GB
 
 
 Recommended:
@@ -40,7 +40,7 @@ CPU (x86_64):  Intel Core i5-10400 or AMD Ryzen 5 3600 or equivalent
 
 CPU (ARM64): 4-core Cortex-A76-class or equivalent
 
-Storage:  48gb storage
+Storage:  64 GB+
 
 
 Heavy Multitasking or Gaming:
