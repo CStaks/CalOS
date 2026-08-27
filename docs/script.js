@@ -94,7 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
         recommendationTitle.textContent = `Recommended: ${title}`;
         recommendationCopy.textContent = copy;
         if (recommendationLink && filename) {
-            recommendationLink.href = `https://sourceforge.net/projects/calos-linux/files/${filename}/download`;
+            const releaseUrl = 'https://github.com/callenflynn/CalOS/releases/latest';
+            recommendationLink.href = `${releaseUrl}#${filename}`;
+            recommendationLink.textContent = 'Open the latest release downloads →';
         }
         hide(questionPanel);
         show(recommendation);
