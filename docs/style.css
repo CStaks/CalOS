@@ -139,7 +139,7 @@ button:focus-visible {
     position: relative;
     display: flex;
     align-items: center;
-    padding: 7rem 0;
+    padding: clamp(3rem, 6vh, 5rem) 0 clamp(4.5rem, 9vh, 6rem);
     background: var(--dark-element);
     color: #fff7f4;
 }
@@ -415,7 +415,7 @@ button:focus-visible {
     }
 
     .about {
-        padding: 5rem 0 6rem;
+        padding: 4rem 0 5.5rem;
     }
 
     .about-grid {
