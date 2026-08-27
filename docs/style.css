@@ -29,7 +29,7 @@ body {
 }
 
 .hero {
-    min-height: 100vh;
+    min-height: 100svh;
     position: relative;
     display: grid;
     place-items: center;
@@ -129,7 +129,10 @@ button:focus-visible {
 }
 
 .about {
-    min-height: 100vh;
+    min-height: 100svh;
+    position: relative;
+    display: flex;
+    align-items: center;
     padding: 7rem 0;
     background: var(--dark-element);
     color: #fff7f4;
@@ -222,7 +225,11 @@ button:focus-visible {
 }
 
 .chooser {
-    padding: 7rem 0;
+    min-height: 100svh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 5rem 0;
     background: var(--bg-color);
 }
 
@@ -232,6 +239,10 @@ button:focus-visible {
     font-size: clamp(2.5rem, 6vw, 4.8rem);
     letter-spacing: -0.06em;
     line-height: 0.98;
+}
+
+.chooser-content {
+    width: 100%;
 }
 
 .chooser-intro {
@@ -244,6 +255,15 @@ button:focus-visible {
 .chooser-step {
     max-width: 780px;
     margin-top: 2.5rem;
+}
+
+.step-label {
+    margin-bottom: 0.55rem;
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
 }
 
 .chooser-step h3 {
@@ -324,6 +344,29 @@ button:focus-visible {
     color: #fff7f4;
 }
 
+.section-cue {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    display: flex;
+    gap: 0.45rem;
+    align-items: center;
+    color: var(--accent);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transform: translateX(-50%);
+}
+
+.section-cue span {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.section-cue:hover,
+.section-cue:focus-visible {
+    text-decoration: underline;
+}
+
 @media (max-width: 760px) {
     .container {
         width: min(100% - 2rem, 600px);
@@ -338,7 +381,7 @@ button:focus-visible {
     }
 
     .about {
-        padding: 5rem 0;
+        padding: 5rem 0 6rem;
     }
 
     .about-grid {
