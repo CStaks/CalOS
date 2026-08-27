@@ -2,7 +2,7 @@
 
 set -ouex pipefail
 
-### REBRAND: Remove Bluefin branding packages and VSCode
+### Rebrand: remove inherited vendor branding packages and VSCode
 # Do removes first while Fedora os-release is still intact (dnf5 needs correct VERSION_ID)
 dnf5 remove -y bluefin-logos bluefin-release bluefin-gtk-theme 2>/dev/null || true
 dnf5 remove -y code 2>/dev/null || true
@@ -50,7 +50,7 @@ dnf5 -y copr disable scottames/ghostty
 dnf5 install -y zoxide --skip-unavailable
 
 ### Neovim + LazyVim (terminal IDE)
-# Install neovim and its ecosystem dependencies (lazygit is preinstalled on Bluefin)
+# Install neovim and its ecosystem dependencies
 dnf5 install -y neovim ripgrep fd-find --skip-unavailable
 
 # Preload LazyVim starter config for new users
@@ -78,7 +78,7 @@ cp /usr/share/calos/Justfile /etc/just/Justfile
 ### Overlay CalOS branding files (after all installs — os-release must NOT override Fedora VERSION_ID yet)
 # Copy the contents of system_files/ of the git repo to /
 cp -avf "/ctx/system_files"/. /
-# Make CalOS the default fastfetch config for every new user. Bluefin's
+# Make CalOS the default fastfetch config for every new user. The base image's
 # profile may already contain FASTFETCH_CONFIG, so override it last.
 mkdir -p /etc/skel/.config/fastfetch
 cat > /etc/skel/.config/fastfetch/config.jsonc << 'CALOSFASTFETCHEOF'
@@ -104,8 +104,7 @@ if [[ -n "${CALOS_VERSION:-}" && -n "${CALOS_CODENAME:-}" ]]; then
 fi
 
 ### Activate CalOS Plymouth boot theme
-# Always overwrite plymouthd.conf — Bluefin's base image ships one with
-# Theme=bluefin, and the conditional check (! -f) never fires.
+# Always overwrite plymouthd.conf so the base image's theme cannot win.
 plymouth-set-default-theme calos 2>/dev/null || true
 mkdir -p /etc/plymouth
 printf '[Daemon]\nTheme=calos\n' > /etc/plymouth/plymouthd.conf
@@ -128,7 +127,7 @@ STARSHIPEOF
 chmod +x /etc/profile.d/calos.sh
 
 ### GDM: ensure CalOS dconf profile exists for login screen branding
-# Bluefin may ship /etc/dconf/profile/gdm — if so, append our system-db;
+# The base image may ship /etc/dconf/profile/gdm — if so, append our system-db;
 # if not, create the standard profile from scratch.
 mkdir -p /etc/dconf/profile
 if [ -f /etc/dconf/profile/gdm ]; then

@@ -12,8 +12,8 @@ Every `env_var(...)` in the Justfile reads from here.
 |---|---|---|
 | `IMAGE_NAME` | `calos` | Image name / tags / labels |
 | `REPO_ORGANIZATION` | `callenflynn` | OCI labels + README label URLs |
-| `IMAGE_DESC` | `CalOS - A custom Fedora Atomic desktop built on Bluefin` | OCI `description` label |
-| `IMAGE_KEYWORDS` | `calos,bluefin,bootc,oci,linux,atomic,gnome` | ArtifactHub keyword label |
+| `IMAGE_DESC` | `CalOS - A custom Fedora Atomic desktop` | OCI `description` label |
+| `IMAGE_KEYWORDS` | `calos,bootc,oci,linux,atomic,gnome` | ArtifactHub keyword label |
 | `IMAGE_LOGO_URL` | raw.githubusercontent `.../CalOS.png` | ArtifactHub logo label |
 | `DEFAULT_TAG` | `latest` | Default tag used by all recipes |
 | `BIB_IMAGE` | `quay.io/centos-bootc/bootc-image-builder:latest` | Container used by the BIB recipes |
@@ -48,7 +48,7 @@ RUN bootc container lint                          # verify image validity
 
 Runs as root inside the base image. Order matters; summarized:
 
-1. **Strip Bluefin branding + VSCode first** (while Fedora `os-release` intact —
+1. **Strip inherited vendor branding + VSCode first** (while Fedora `os-release` intact —
    dnf5 needs correct `VERSION_ID`):
    `dnf5 remove bluefin-logos bluefin-release bluefin-gtk-theme code`
 2. **Starship** — direct GitHub-release tarball → `/usr/bin/starship`

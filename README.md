@@ -1,7 +1,7 @@
 # CalOS
 <img height="150" src="CalOS/calos-github-social.png">
 
-A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bluefin).
+A custom Fedora Atomic desktop built on a Fedora Atomic base image.
 
 > [!WARNING]
 > This is a side project and may stop recieving updates at any time.
@@ -10,8 +10,8 @@ A custom Fedora Atomic desktop built on [Bluefin](https://github.com/ublue-os/bl
 
 | Tag | Base Image | GPU |
 |-----|-----------|-----|
-| `:latest` | `ghcr.io/ublue-os/bluefin:stable` | AMD / Intel |
-| `:latest-nvidia` | `ghcr.io/ublue-os/bluefin-nvidia-open:stable` | NVIDIA (open drivers) |
+| `:latest` | Fedora Atomic base | AMD / Intel |
+| `:latest-nvidia` | Fedora Atomic base with NVIDIA drivers | NVIDIA (open drivers) |
 | `:vX.Y.Z` / `:vX.Y.Z-nvidia` | released on each `v*` tag | matching variant |
 
 Both container variants are built daily via GitHub Actions and pushed to GHCR. Tagged releases (e.g. `v1.2.0`) also publish versioned container images (`:v1.2.0` / `:v1.2.0-nvidia`) with the release codename baked in. The ISO, QCOW2, and VMDK files are hosted on SourceForge.
@@ -50,7 +50,7 @@ Every minor version has a codename — v1.1 is **CalOS Huron**, v1.2 is **CalOS 
 
 
 ## Bootc
-From any bootc-based system (Bluefin, Bazzite, Aurora, Fedora Atomic):
+From any bootc-based system (Bazzite, Aurora, Fedora Atomic, or another bootc image):
 
 ```bash
 sudo bootc switch ghcr.io/callenflynn/calos:latest
@@ -69,7 +69,7 @@ sudo bootc update
 sudo reboot
 ```
 
-To pin a specific release instead of the rolling `latest` (replace v1.1.1 with the version you want to use):
+To pin a specific release instead of the rolling `latest` (replace v1.1.3 with the version you want to use):
 
 ```bash
 # Standard / AMD / Intel 
@@ -85,10 +85,10 @@ Reboot to apply. For the rolling channel, `bootc update` checks the selected Cal
 
 Prebuilt qcow2 + vmdk (VMs) and anaconda-iso (USB/installer) images are built daily and published automatically to the [SourceForge project files](https://sourceforge.net/projects/calos-linux/):
 
-- **standard** — AMD / Intel GPUs (qcow2 for QEMU/Boxes, vmdk for VMware, installer ISO)
-- **nvidia** — NVIDIA GPUs (qcow2, installer ISO)
+- **standard** — AMD / Intel physical hardware (qcow2 for QEMU/Boxes, standard vmdk for VMware, installer ISO)
+- **nvidia** — NVIDIA physical hardware (qcow2, installer ISO); there is no NVIDIA VMDK because VMware virtualizes the GPU
 
-Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/callenflynn/calos/releases). Use the latest GitHub Release to identify the current version; the actual files are linked from that release into its matching SourceForge folder (for example `/1.1.2/`). The docs site currently points to the latest published folder; update `latestRelease` in `docs/script.js` when publishing a new release. SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page, so you can verify any download there.
+Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/callenflynn/calos/releases). Use the latest GitHub Release to identify the current version; the actual files are linked from that release into its matching SourceForge folder (for example `/1.1.3/`). The docs site points to the current release folder through the generated `docs/latest-release.js` file. The release workflow updates that file automatically whenever a version tag is published. SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page, so you can verify any download there.
 
 ## What's Included
 

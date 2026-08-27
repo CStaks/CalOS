@@ -224,6 +224,19 @@ jobs:
           path: release
           pattern: disk-images-*
 
+      - name: Update docs chooser release
+        if: github.ref_type == 'tag'
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          printf 'window.CALOS_LATEST_RELEASE = %s;\n' "$(printf '%s' "$VERSION" | jq -Rr @json)" > docs/latest-release.js
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add docs/latest-release.js
+          git diff --cached --quiet || git commit -m "Update docs chooser to ${VERSION}"
+          git push origin HEAD:main
+
       - name: Publish disk images
         shell: bash
         env:
@@ -265,7 +278,7 @@ jobs:
           =================
 
           - standard-disk.qcow2 — VM disk image for QEMU/Boxes (AMD / Intel GPUs)
-          - standard-disk.vmdk — VMware disk image (AMD / Intel GPUs)
+          - standard-disk.vmdk — VMware disk image (works with any virtual GPU)
           - nvidia-disk.qcow2 — VM disk image for QEMU/Boxes (NVIDIA GPUs)
           - standard-install.iso — USB/installer image (AMD / Intel GPUs)
           - nvidia-install.iso — USB/installer image (NVIDIA GPUs)
@@ -347,7 +360,7 @@ jobs:
 
           - [standard-install.iso]($SF_URL/standard-install.iso/download) — bootable USB/installer media
           - [standard-disk.qcow2]($SF_URL/standard-disk.qcow2/download) — QEMU/Boxes VM disk image
-          - [standard-disk.vmdk]($SF_URL/standard-disk.vmdk/download) — VMware VM disk image
+          - [standard-disk.vmdk]($SF_URL/standard-disk.vmdk/download) — VMware VM disk image (works with any virtual GPU)
 
           ### NVIDIA (NVIDIA GPUs only)
 

@@ -1,5 +1,5 @@
 NAME="CalOS"
-ID="fedora"
+ID="calos"
 ID_LIKE="fedora"
 VERSION="1.0 (CalOS)"
 VERSION_ID="41"

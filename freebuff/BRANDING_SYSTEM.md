@@ -20,10 +20,10 @@ fastfetch/neofetch, starship, and wallpapers.
 
 ### Identity (`usr/lib/os-release`)
 ```
-NAME="CalOS"  ID="fedora"  VERSION="1.0 (Bluefin)"  VERSION_ID="41"
+NAME="CalOS"  ID="calos"  VERSION="1.0 (CalOS)"  VERSION_ID="41"
 PRETTY_NAME="CalOS"  HOME_URL/SUPPORT_URL/BUG_REPORT_URL → github.com/callenflynn/CalOS
 ```
-Overrides Bluefin's os-release (which build.sh removes first). Note `VERSION_ID=41`
+Overrides the base image's os-release (which build.sh removes first). Note `VERSION_ID=41`
 is hardcoded — goes stale as Fedora rolls. The repository URLs use the actual
 owner, `callenflynn` (Callen Flynn).
 

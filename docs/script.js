@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recommendationTitle.textContent = `Recommended: ${title}`;
         recommendationCopy.textContent = copy;
         if (recommendationLink && filename) {
-            const latestRelease = '1.1.2';
+            const latestRelease = window.CALOS_LATEST_RELEASE || '1.1.3';
             const sourceForgeUrl = `https://sourceforge.net/projects/calos-linux/files/${latestRelease}/${encodeURIComponent(filename)}/download`;
             recommendationLink.href = sourceForgeUrl;
             recommendationLink.textContent = 'Download from SourceForge →';

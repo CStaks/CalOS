@@ -15,7 +15,7 @@ Triggers: PR to `main` · daily cron `05 10 * * *` · push to `main`
 | standard | *(none)* | `ghcr.io/ublue-os/bluefin:stable` |
 | nvidia | `-nvidia` | `ghcr.io/ublue-os/bluefin-nvidia-open:stable` |
 
-Flow: checkout → free up space (`ublue-os/remove-unwanted-software`) → `just
+Flow: checkout → free up space (runner cleanup action) → `just
 check` → resolve image name/tag → **`just build` with `BASE_IMAGE` build-arg** →
 **`just ostree-rechunk`** (smaller delta updates) → generate alias tags
 (`latest`, `latest-YYYYMMDD`, `latest-SHA`, `latest-DATE-SHA`) → `just

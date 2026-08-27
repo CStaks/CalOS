@@ -7,8 +7,7 @@
 ## Project at a Glance
 
 - **What it is:** CalOS — a custom Fedora Atomic (bootc) desktop operating system
-  image layered on top of [Bluefin](https://github.com/ublue-os/bluefin)
-  (Universal Blue).
+  image layered on top of a Fedora Atomic base image.
 - **How it's distributed:** OCI container images pushed to GHCR
   (`ghcr.io/callenflynn/calos` and `:latest-nvidia`), consumed via
   `sudo bootc switch ghcr.io/callenflynn/calos:latest`.
@@ -26,7 +25,7 @@ GitHub Actions (`build.yml`) builds a matrix of two variants — **standard**
 (base `ghcr.io/ublue-os/bluefin:stable`) and **nvidia** (base
 `ghcr.io/ublue-os/bluefin-nvidia-open:stable`) — by passing `BASE_IMAGE` as a
 build arg. `Containerfile` stages `build_files/` + `system_files/` into a `ctx`
-stage, then runs `build.sh` inside the base image. `build.sh` uninstalls Bluefin
+stage, then runs `build.sh` inside the base image. `build.sh` removes inherited vendor
 branding + VSCode/Firefox/GNOME Terminal, installs CalOS's app set (Zed, Brave,
 Ghostty, Neovim+LazyVim, starship), and overlays `system_files/` onto `/` (the
 CalOS brand layer: os-release, GRUB, Plymouth, GDM, wallpapers, dock, shell
@@ -85,7 +84,7 @@ releases get e.g. "CalOS Superior".
     │       ├── neofetch/config.conf     # neofetch → same ASCII art
     │       └── starship.toml            # CalOS-themed prompt (brand colors)
     └── usr/
-        ├── lib/os-release         # CalOS identity (VERSION_ID=41, Bluefin)
+        ├── lib/os-release         # CalOS identity (VERSION_ID=41)
         ├── share/
         │   ├── backgrounds/calos/       # Wallpaper copies installed to system
         │   ├── fastfetch/               # calos-logo.txt + presets/calos.jsonc
@@ -133,7 +132,7 @@ releases get e.g. "CalOS Superior".
    `inputs.stream_name`** which are not declared inputs (harmless, from template).
 7. **`os-release` pins `VERSION_ID=41`** even though the base is `bluefin:stable`
    (rolling) — will go stale as Fedora bumps. `build.sh` deliberately removes
-   Bluefin's os-release first so this override wins.
+   the base image's os-release first so this override wins.
 8. **`cosign.pub` is committed but `cosign.key` is gitignored** — signing key must
    live in the `SIGNING_SECRET` repo secret; public key in repo for verification.
 9. **Starship only initializes for bash** (`/etc/profile.d/calos.sh`) — no zsh

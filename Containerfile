@@ -1,5 +1,5 @@
 # Base Image
-# Use --build-arg BASE_IMAGE=... to override (e.g. ghcr.io/ublue-os/bluefin-nvidia-open:stable)
+# Use --build-arg BASE_IMAGE=... to override for the NVIDIA variant when needed.
 ARG BASE_IMAGE=ghcr.io/ublue-os/bluefin:stable
 
 # Allow build scripts to be referenced without being copied into the final image
@@ -15,13 +15,7 @@ FROM ${BASE_IMAGE}
 ARG CALOS_VERSION=""
 ARG CALOS_CODENAME=""
 
-## Other possible base images include:
-# FROM ghcr.io/ublue-os/bazzite:testing
-# FROM ghcr.io/ublue-os/aurora:stable
-# FROM ghcr.io/ublue-os/bluefin-nvidia-open:stable
-#
-# ... and so on, here are more base images
-# Universal Blue Images: https://github.com/orgs/ublue-os/packages
+## Other possible Fedora Atomic base images can be selected here when needed.
 # Fedora base image: quay.io/fedora/fedora-bootc:44
 # CentOS base images: quay.io/centos-bootc/centos-bootc:stream10
 
