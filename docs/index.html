@@ -69,30 +69,12 @@
                 <h2 id="chooser-title">What image is right for you?</h2>
                 <p class="chooser-intro">Two quick questions. One clear recommendation.</p>
 
-                <div class="chooser-step" id="graphics-step">
-                    <p class="step-label">Question 1 of 2</p>
-                    <h3>What graphics card do you have?</h3>
-                    <div class="choice-grid">
+                <div class="question-panel" id="question-panel" aria-live="polite">
+                    <p class="step-label" id="step-label">Question 1 of 2</p>
+                    <h3 id="question-title">What graphics card do you have?</h3>
+                    <div class="choice-grid" id="choice-grid">
                         <button class="choice" data-graphics="standard">AMD or Intel<span>Use the Standard build</span></button>
                         <button class="choice" data-graphics="nvidia">NVIDIA<span>Use the NVIDIA build</span></button>
-                    </div>
-                </div>
-
-                <div class="chooser-step is-hidden" id="install-step">
-                    <p class="step-label">Question 2 of 2</p>
-                    <h3>Are you installing on hardware or in a VM?</h3>
-                    <div class="choice-grid">
-                        <button class="choice" data-install="hardware">Hardware<span>Install from an ISO</span></button>
-                        <button class="choice" data-install="vm">Virtual machine<span>Choose QCOW2 or VMDK next</span></button>
-                    </div>
-                </div>
-
-                <div class="chooser-step is-hidden" id="vm-step">
-                    <p class="step-label">One last choice</p>
-                    <h3>Which virtual machine software?</h3>
-                    <div class="choice-grid">
-                        <button class="choice" data-vm="qcow2">QEMU or GNOME Boxes<span>Download QCOW2</span></button>
-                        <button class="choice" data-vm="vmdk">VMware<span>Download VMDK</span></button>
                     </div>
                 </div>
 

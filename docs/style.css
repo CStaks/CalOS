@@ -252,8 +252,9 @@ button:focus-visible {
     font-size: 1.05rem;
 }
 
-.chooser-step {
+.question-panel {
     max-width: 780px;
+    min-height: 220px;
     margin-top: 2.5rem;
 }
 
@@ -266,7 +267,7 @@ button:focus-visible {
     text-transform: uppercase;
 }
 
-.chooser-step h3 {
+.question-panel h3 {
     margin-bottom: 1rem;
     font-size: 1.25rem;
 }
