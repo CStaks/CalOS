@@ -104,7 +104,7 @@ Prebuilt qcow2 + vmdk (VMs) and anaconda-iso (USB/installer) images are built da
 - **standard** — AMD / Intel physical hardware (qcow2 for QEMU/Boxes, standard vmdk for VMware, installer ISO)
 - **nvidia** — NVIDIA physical hardware (qcow2, installer ISO); there is no NVIDIA VMDK because VMware virtualizes the GPU
 
-Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/callenflynn/calos/releases). Use the latest GitHub Release to identify the current version; the actual files are linked from that release into its matching SourceForge folder (for example `/1.1.3/`). The docs site points to the current release folder through the generated `docs/latest-release.js` file. The release workflow updates that file automatically whenever a version tag is published. SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page, so you can verify any download there.
+Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/callenflynn/calos/releases). Use the latest GitHub Release to identify the current version; the actual files are linked from that release into its matching SourceForge folder (for example `/1.1.3/`). SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page.
 
 ## What's Included
 
