@@ -46,6 +46,9 @@ dnf5 install -y ghostty
 # Disable the COPR so it doesn't remain enabled on the final image
 dnf5 -y copr disable scottames/ghostty
 
+### Zoxide (smarter cd replacement)
+dnf5 install -y zoxide --skip-unavailable
+
 ### Neovim + LazyVim (terminal IDE)
 # Install neovim and its ecosystem dependencies (lazygit is preinstalled on Bluefin)
 dnf5 install -y neovim ripgrep fd-find --skip-unavailable
@@ -74,13 +77,11 @@ if [[ -n "${CALOS_VERSION:-}" && -n "${CALOS_CODENAME:-}" ]]; then
 fi
 
 ### Activate CalOS Plymouth boot theme
-# Set CalOS as the default Plymouth theme
+# Always overwrite plymouthd.conf — Bluefin's base image ships one with
+# Theme=bluefin, and the conditional check (! -f) never fires.
 plymouth-set-default-theme calos 2>/dev/null || true
-# Fallback: set theme via config file if plymouth-set-default-theme not available
-if [ ! -f /etc/plymouth/plymouthd.conf ]; then
-    mkdir -p /etc/plymouth
-    printf '[Daemon]\nTheme=calos\n' > /etc/plymouth/plymouthd.conf
-fi
+mkdir -p /etc/plymouth
+printf '[Daemon]\nTheme=calos\n' > /etc/plymouth/plymouthd.conf
 
 ### Shell prompt: enable starship for new users
 # Profile.d script initializes starship for both bash and zsh
@@ -89,10 +90,36 @@ cat > /etc/profile.d/calos.sh << 'STARSHIPEOF'
 if command -v starship &> /dev/null; then
     eval "$(starship init bash)"
 fi
+# CalOS - Zoxide (smarter cd)
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init bash)"
+fi
 STARSHIPEOF
 chmod +x /etc/profile.d/calos.sh
 
-### GDM: compile dconf for login screen logo
+### GDM: ensure CalOS dconf profile exists for login screen branding
+# Bluefin may ship /etc/dconf/profile/gdm — if so, append our system-db;
+# if not, create the standard profile from scratch.
+if [ -f /etc/dconf/profile/gdm ]; then
+    if ! grep -q 'system-db:calos' /etc/dconf/profile/gdm; then
+        printf 'system-db:calos\n' >> /etc/dconf/profile/gdm
+    fi
+else
+    mkdir -p /etc/dconf/profile
+    printf 'user-db:user\nsystem-db:gdm\nfile-db:/usr/share/gdm/greeter-dconf-defaults\nsystem-db:calos\n' > /etc/dconf/profile/gdm
+fi
+
+# Ensure the site db (user session defaults) is also on the profile
+if [ -f /etc/dconf/profile/user ]; then
+    if ! grep -q 'system-db:calos' /etc/dconf/profile/user; then
+        printf 'system-db:calos\n' >> /etc/dconf/profile/user
+    fi
+else
+    mkdir -p /etc/dconf/profile
+    printf 'user-db:user\nsystem-db:site\nsystem-db:local\nsystem-db:calos\n' > /etc/dconf/profile/user
+fi
+
+### Compile dconf databases
 dconf update
 
 # Use a COPR Example:

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>Fuji</name>
+    <filename>/usr/share/backgrounds/calos/fuji.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#050505</pcolor>
+    <scolor>#050505</scolor>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Mountains</name>
+    <filename>/usr/share/backgrounds/calos/mountains.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#050505</pcolor>
+    <scolor>#050505</scolor>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Night Iceberg</name>
+    <filename>/usr/share/backgrounds/calos/night-iceberg.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#050505</pcolor>
+    <scolor>#050505</scolor>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Big Sur</name>
+    <filename>/usr/share/backgrounds/calos/macos-big-sur-wallpaper-5-scaled.jpg</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#050505</pcolor>
+    <scolor>#050505</scolor>
+  </wallpaper>
+</wallpapers>

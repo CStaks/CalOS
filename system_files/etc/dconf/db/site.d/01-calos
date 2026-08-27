@@ -1,0 +1,9 @@
+[org.gnome.shell]
+favorite-apps=['org.gnome.Nautilus.desktop', 'brave-browser.desktop', 'dev.zed.Zed.desktop', 'com.mitchellh.ghostty.desktop', 'org.gnome.Software.desktop', 'org.gnome.Settings.desktop']
+
+[org.gnome.desktop.default-applications.terminal]
+exec='ghostty'
+
+[org.gnome.shell.extensions.logo-menu]
+use-custom-icon=true
+custom-icon-path='/usr/share/pixmaps/CalOS-bw.png'
