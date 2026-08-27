@@ -133,10 +133,9 @@ chmod +x /etc/profile.d/calos.sh
 mkdir -p /etc/dconf/profile
 if [ -f /etc/dconf/profile/gdm ]; then
     # Keep the base profile's databases, but ensure CalOS is the final layer.
-    grep -v '^system-db:calos$' /etc/dconf/profile/gdm > /tmp/calos-gdm-profile
-    printf 'system-db:calos\n' >> /tmp/calos-gdm-profile
-    cp /tmp/calos-gdm-profile /etc/dconf/profile/gdm
-    rm -f /tmp/calos-gdm-profile
+    grep -v '^system-db:calos$' /etc/dconf/profile/gdm > /etc/dconf/profile/gdm.calos.tmp
+    printf 'system-db:calos\n' >> /etc/dconf/profile/gdm.calos.tmp
+    mv /etc/dconf/profile/gdm.calos.tmp /etc/dconf/profile/gdm
 else
     printf 'user-db:user\nsystem-db:gdm\nfile-db:/usr/share/gdm/greeter-dconf-defaults\nsystem-db:calos\n' > /etc/dconf/profile/gdm
 fi
