@@ -36,18 +36,6 @@ body {
     overflow: hidden;
 }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    width: 34rem;
-    height: 34rem;
-    border-radius: 50%;
-    background: var(--accent);
-    opacity: 0.08;
-    filter: blur(2px);
-    transform: translate(35%, -35%);
-}
-
 .hero-content {
     position: relative;
     z-index: 1;
