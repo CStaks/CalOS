@@ -1,0 +1,1 @@
+window.CALOS_LATEST_RELEASE = "1.1.3";
