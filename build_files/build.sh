@@ -60,6 +60,21 @@ mkdir -p "$(dirname "$LAZYVIM_SKEL")"
 git clone https://github.com/LazyVim/starter.git "$LAZYVIM_SKEL"
 rm -rf "$LAZYVIM_SKEL/.git"
 
+### Install the CalOS convenience command set
+# The source Justfile is a build/development task file, so ship a small
+# end-user Justfile separately instead of exposing build recipes in releases.
+dnf5 install -y just --skip-unavailable
+mkdir -p /usr/share/calos
+cat > /usr/share/calos/Justfile << 'CALOSJUSTEOF'
+# CalOS user commands
+update:
+    sudo bootc update
+    sudo reboot
+CALOSJUSTEOF
+# Make plain `just update` work from any directory on the installed system.
+mkdir -p /etc/just
+cp /usr/share/calos/Justfile /etc/just/Justfile
+
 ### Overlay CalOS branding files (after all installs — os-release must NOT override Fedora VERSION_ID yet)
 # Copy the contents of system_files/ of the git repo to /
 cp -avf "/ctx/system_files"/. /
