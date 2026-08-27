@@ -1,2 +1,6 @@
 [org.gnome.login-screen]
 logo='/usr/share/pixmaps/CalOS.svg'
+
+[org.gnome.shell.extensions.logo-menu]
+use-custom-icon=true
+custom-icon-path='/usr/share/pixmaps/CalOS-bw.png'

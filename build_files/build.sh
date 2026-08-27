@@ -130,12 +130,14 @@ chmod +x /etc/profile.d/calos.sh
 ### GDM: ensure CalOS dconf profile exists for login screen branding
 # Bluefin may ship /etc/dconf/profile/gdm — if so, append our system-db;
 # if not, create the standard profile from scratch.
+mkdir -p /etc/dconf/profile
 if [ -f /etc/dconf/profile/gdm ]; then
-    if ! grep -q 'system-db:calos' /etc/dconf/profile/gdm; then
-        printf 'system-db:calos\n' >> /etc/dconf/profile/gdm
-    fi
+    # Keep the base profile's databases, but ensure CalOS is the final layer.
+    grep -v '^system-db:calos$' /etc/dconf/profile/gdm > /tmp/calos-gdm-profile
+    printf 'system-db:calos\n' >> /tmp/calos-gdm-profile
+    cp /tmp/calos-gdm-profile /etc/dconf/profile/gdm
+    rm -f /tmp/calos-gdm-profile
 else
-    mkdir -p /etc/dconf/profile
     printf 'user-db:user\nsystem-db:gdm\nfile-db:/usr/share/gdm/greeter-dconf-defaults\nsystem-db:calos\n' > /etc/dconf/profile/gdm
 fi
 
