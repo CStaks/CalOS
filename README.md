@@ -126,3 +126,9 @@ v1.1.0 desktop
 primary logo
 
 <img src="CalOS/CalOS.png" height=120>
+
+
+
+B&W
+
+<img src="CalOS/CalOS-bw.png" height=120>
