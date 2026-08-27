@@ -64,25 +64,30 @@
         </section>
 
         <section id="chooser" class="chooser" aria-labelledby="chooser-title">
-            <div class="container chooser-content">
-                <p class="eyebrow">Find your download</p>
-                <h2 id="chooser-title">What image is right for you?</h2>
-                <p class="chooser-intro">Two quick questions. One clear recommendation.</p>
-
-                <div class="question-panel" id="question-panel" aria-live="polite">
-                    <p class="step-label" id="step-label">Question 1 of 2</p>
-                    <h3 id="question-title">What graphics card do you have?</h3>
-                    <div class="choice-grid" id="choice-grid">
-                        <button class="choice" data-graphics="standard">AMD or Intel<span>Use the Standard build</span></button>
-                        <button class="choice" data-graphics="nvidia">NVIDIA<span>Use the NVIDIA build</span></button>
-                    </div>
+            <div class="container chooser-layout">
+                <div class="chooser-copy">
+                    <p class="eyebrow">Find your download</p>
+                    <h2 id="chooser-title">What image is right for you?</h2>
+                    <p class="chooser-intro">Two quick questions. One clear recommendation.</p>
+                    <p class="chooser-note">Answer a few simple questions and CalOS will guide you to the right download.</p>
                 </div>
 
-                <div class="recommendation is-hidden" id="recommendation" aria-live="polite">
-                    <strong id="recommendation-title"></strong>
-                    <p id="recommendation-copy"></p>
-                    <a id="recommendation-link" class="recommendation-link" href="https://sourceforge.net/projects/calos-linux/files/">Download from SourceForge <span aria-hidden="true">→</span></a>
-                    <button id="chooser-reset" class="reset-button">Start over</button>
+                <div class="chooser-interaction">
+                    <div class="question-panel" id="question-panel" aria-live="polite">
+                        <p class="step-label" id="step-label">Question 1 of 2</p>
+                        <h3 id="question-title">What graphics card do you have?</h3>
+                        <div class="choice-grid" id="choice-grid">
+                            <button class="choice" data-graphics="standard">AMD or Intel<span>Use the Standard build</span></button>
+                            <button class="choice" data-graphics="nvidia">NVIDIA<span>Use the NVIDIA build</span></button>
+                        </div>
+                    </div>
+
+                    <div class="recommendation is-hidden" id="recommendation" aria-live="polite">
+                        <strong id="recommendation-title"></strong>
+                        <p id="recommendation-copy"></p>
+                        <a id="recommendation-link" class="recommendation-link" href="https://sourceforge.net/projects/calos-linux/files/">Download from SourceForge <span aria-hidden="true">→</span></a>
+                        <button id="chooser-reset" class="reset-button">Start over</button>
+                    </div>
                 </div>
             </div>
         </section>
