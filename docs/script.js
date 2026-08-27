@@ -74,9 +74,11 @@ document.addEventListener('DOMContentLoaded', () => {
             showRecommendation(
                 `${gpu} ${format}`,
                 button.dataset.vm === 'vmdk'
-                    ? `${gpu} VMDK for VMware virtual machines.`
+                    ? 'Standard VMDK for VMware virtual machines. VMware virtualizes the GPU, so use this file for NVIDIA, AMD, or Intel hosts.'
                     : `${gpu} QCOW2 for QEMU or GNOME Boxes virtual machines.`,
-                `${graphicsChoice === 'nvidia' ? 'nvidia' : 'standard'}-disk.${button.dataset.vm}`,
+                button.dataset.vm === 'vmdk'
+                    ? 'standard-disk.vmdk'
+                    : `${graphicsChoice === 'nvidia' ? 'nvidia' : 'standard'}-disk.qcow2`,
             );
         }
     });
