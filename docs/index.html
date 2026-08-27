@@ -62,6 +62,45 @@
                 </figure>
             </div>
         </section>
+
+        <section id="chooser" class="chooser" aria-labelledby="chooser-title">
+            <div class="container">
+                <p class="eyebrow">Find your download</p>
+                <h2 id="chooser-title">What image is right for you?</h2>
+                <p class="chooser-intro">Answer two quick questions and we’ll point you to the right CalOS image.</p>
+
+                <div class="chooser-step" id="graphics-step">
+                    <h3>1. What graphics card do you have?</h3>
+                    <div class="choice-grid">
+                        <button class="choice" data-graphics="standard">AMD or Intel<span>Use the Standard build</span></button>
+                        <button class="choice" data-graphics="nvidia">NVIDIA<span>Use the NVIDIA build</span></button>
+                    </div>
+                </div>
+
+                <div class="chooser-step is-hidden" id="install-step">
+                    <h3>2. Are you installing on hardware or in a VM?</h3>
+                    <div class="choice-grid">
+                        <button class="choice" data-install="hardware">Hardware<span>Install from an ISO</span></button>
+                        <button class="choice" data-install="vm">Virtual machine<span>Choose QCOW2 or VMDK</span></button>
+                    </div>
+                </div>
+
+                <div class="chooser-step is-hidden" id="vm-step">
+                    <h3>3. Which virtual machine software?</h3>
+                    <div class="choice-grid">
+                        <button class="choice" data-vm="qcow2">QEMU or GNOME Boxes<span>Download QCOW2</span></button>
+                        <button class="choice" data-vm="vmdk">VMware<span>Download VMDK</span></button>
+                    </div>
+                </div>
+
+                <div class="recommendation is-hidden" id="recommendation" aria-live="polite">
+                    <strong id="recommendation-title"></strong>
+                    <p id="recommendation-copy"></p>
+                    <a id="recommendation-link" class="recommendation-link" href="https://sourceforge.net/projects/calos-linux/files/">View downloads <span aria-hidden="true">→</span></a>
+                    <button id="chooser-reset" class="reset-button">Start over</button>
+                </div>
+            </div>
+        </section>
     </main>
     <script src="script.js"></script>
 </body>
