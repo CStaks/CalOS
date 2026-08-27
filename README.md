@@ -106,7 +106,7 @@ Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. 
 # Screenshots
 
 v1.1.0 desktop
-<img src="CalOS/v1.1.0-desktop-screenshot-1.webp">
+<img src="CalOS/v1.1.0-desktop-screenshot-1.webp" height=240>
 
 
 # Branding
@@ -123,4 +123,4 @@ v1.1.0 desktop
 ## Logos
 
 primary logo
-<img src="CalOS/CalOS.png">
+<img src="CalOS/CalOS.png" height=120>
