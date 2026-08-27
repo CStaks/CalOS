@@ -14,7 +14,6 @@ A custom Fedora Atomic desktop built on a Fedora Atomic base image.
 | `:latest-nvidia` | Fedora Atomic base with NVIDIA drivers | NVIDIA (open drivers) |
 | `:vX.Y.Z` / `:vX.Y.Z-nvidia` | released on each `v*` tag | matching variant |
 
-Both container variants are built daily via GitHub Actions and pushed to GHCR. Tagged releases (e.g. `v1.2.0`) also publish versioned container images (`:v1.2.0` / `:v1.2.0-nvidia`) with the release codename baked in. The ISO, QCOW2, and VMDK files are hosted on SourceForge.
 
 # Minimum Requirements
 If you do not meet the minimum specs, the operating system may perform poorly and become unstable.
