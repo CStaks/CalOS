@@ -57,7 +57,8 @@ directory, git branch/status, command duration; accent `#FF3B00`, success symbol
 ### Terminal info tools
 - `usr/share/fastfetch/calos-logo.txt` — the ASCII CalOS logo (source of truth).
 - `usr/share/fastfetch/presets/calos.jsonc` + `etc/skel/.config/fastfetch/config.jsonc`
-  — point fastfetch at the logo file.
+  — point fastfetch at the logo file. `/etc/profile.d/calos.sh` also exports
+  `FASTFETCH_CONFIG` so the CalOS preset wins over a base-image default.
 - `etc/skel/.config/neofetch/config.conf` — neofetch uses the same ASCII file with
   brand-colored ANSI palette `(1 6 4 12 8 14)`.
 

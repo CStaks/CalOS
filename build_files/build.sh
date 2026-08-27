@@ -63,6 +63,18 @@ rm -rf "$LAZYVIM_SKEL/.git"
 ### Overlay CalOS branding files (after all installs — os-release must NOT override Fedora VERSION_ID yet)
 # Copy the contents of system_files/ of the git repo to /
 cp -avf "/ctx/system_files"/. /
+# Make CalOS the default fastfetch config for every new user. Bluefin's
+# profile may already contain FASTFETCH_CONFIG, so override it last.
+mkdir -p /etc/skel/.config/fastfetch
+cat > /etc/skel/.config/fastfetch/config.jsonc << 'CALOSFASTFETCHEOF'
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "source": "/usr/share/fastfetch/calos-logo.txt",
+        "type": "file"
+    }
+}
+CALOSFASTFETCHEOF
 # Compile GSettings schemas so our wallpaper/favorites override takes effect
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 
@@ -86,6 +98,9 @@ printf '[Daemon]\nTheme=calos\n' > /etc/plymouth/plymouthd.conf
 ### Shell prompt: enable starship for new users
 # Profile.d script initializes starship for both bash and zsh
 cat > /etc/profile.d/calos.sh << 'STARSHIPEOF'
+# CalOS - terminal info defaults
+export FASTFETCH_CONFIG=/usr/share/fastfetch/presets/calos.jsonc
+
 # CalOS - Starship prompt
 if command -v starship &> /dev/null; then
     eval "$(starship init bash)"
