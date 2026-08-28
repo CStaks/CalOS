@@ -15,12 +15,14 @@ dnf5 remove -y code 2>/dev/null || true
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
 ### Starship prompt (direct binary — not in Fedora repos)
-# Arch-aware: arm64 builds must pull the aarch64 release, not the x86_64 one.
+# Arch-aware: Starship publishes x86_64 as gnu but aarch64 only as musl
+# (statically linked, runs fine on Fedora's glibc). Verified against the
+# v1.26.0 release assets.
 case "$(uname -m)" in
-    aarch64) STARSHIP_ARCH="aarch64" ;;
-    *)       STARSHIP_ARCH="x86_64" ;;
+    aarch64) STARSHIP_TRIPLE="aarch64-unknown-linux-musl" ;;
+    *)       STARSHIP_TRIPLE="x86_64-unknown-linux-gnu" ;;
 esac
-curl -fsSL "https://github.com/starship/starship/releases/latest/download/starship-${STARSHIP_ARCH}-unknown-linux-gnu.tar.gz" | tar xz -C /usr/bin
+curl -fsSL "https://github.com/starship/starship/releases/latest/download/starship-${STARSHIP_TRIPLE}.tar.gz" | tar xz -C /usr/bin
 
 ### Zed Editor (replaces VSCode as primary IDE)
 # Manual tarball install — avoids /root not being a directory in the container.

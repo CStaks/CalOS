@@ -52,8 +52,10 @@ Runs as root inside the base image. Order matters; summarized:
    dnf5 needs correct `VERSION_ID`):
    `dnf5 remove bluefin-logos bluefin-release bluefin-gtk-theme code`
 2. **Starship** — direct GitHub-release tarball → `/usr/bin/starship`
-   (not in Fedora repos). **Arch-aware**: picks the `aarch64` release on ARM64
-   builds (`uname -m`), not the x86_64 one.
+   (not in Fedora repos). **Arch-aware**: x86_64 uses the gnu build,
+   aarch64 uses the **musl** build (`starship-aarch64-unknown-linux-musl` —
+   Starship doesn't publish an aarch64 gnu asset; the musl binary is static
+   and runs fine on Fedora).
 3. **Zed** (replaces VSCode) — tarball from zed.dev (`zed-linux-aarch64.tar.gz`
    on ARM64); copies binary to `/usr/bin/zed`, `.desktop` file to
    `/usr/share/applications`, icons to `/usr/share/icons/hicolor`; avoids the
