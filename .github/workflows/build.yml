@@ -33,6 +33,7 @@ on:
       - '/.github/ISSUE_TEMPLATE/**'
       - '/freebuff/**'
       - '/Justfile'
+      - '/scripts/'
   workflow_dispatch:
 
 permissions:

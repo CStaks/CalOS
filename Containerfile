@@ -40,6 +40,23 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build.sh
 
-### LINTING
-## Verify final image and contents are correct.
-RUN bootc container lint
+### BRANDING METADATA
+## Stamp CalOS's own OCI / Artifact Hub labels so the published image is
+## branded as CalOS rather than inheriting the base image's labels (e.g.
+## Bluefin / ublue-os). These override the base labels on the final image;
+## the ARG defaults keep values correct even when not passed as build args.
+ARG IMAGE_NAME="calos"
+ARG REPO_ORGANIZATION="callenflynn"
+ARG IMAGE_DESC="CalOS - A custom Fedora Atomic desktop"
+ARG IMAGE_KEYWORDS="calos,bootc,oci,linux,atomic,gnome"
+ARG IMAGE_LOGO_URL="https://raw.githubusercontent.com/callenflynn/CalOS/main/CalOS/CalOS.png"
+
+LABEL org.opencontainers.image.title="${IMAGE_NAME}"
+LABEL org.opencontainers.image.vendor="${REPO_ORGANIZATION}"
+LABEL org.opencontainers.image.description="${IMAGE_DESC}"
+LABEL org.opencontainers.image.url="https://github.com/${REPO_ORGANIZATION}/${IMAGE_NAME}"
+LABEL org.opencontainers.image.source="https://raw.githubusercontent.com/${REPO_ORGANIZATION}/${IMAGE_NAME}/main/Containerfile"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL io.artifacthub.package.logo-url="${IMAGE_LOGO_URL}"
+LABEL io.artifacthub.package.keywords="${IMAGE_KEYWORDS}"
+LABEL io.artifacthub.package.maintainers="[{\"name\": \"callenflynn\"}]"

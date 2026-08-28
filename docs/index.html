@@ -38,6 +38,7 @@
                 <p class="description">A calm, capable Linux desktop that stays out of your way.</p>
                 <div class="actions">
                     <button id="btn-github">GitHub</button>
+                    <button id="btn-wiki">Wiki</button>
                     <button id="btn-download">Choose your image</button>
                 </div>
             </div>
@@ -63,8 +64,8 @@
                     <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/v1.1.0-desktop-screenshot-1.webp?raw=true" alt="CalOS desktop showing its applications and wallpaper">
                     <figcaption>CalOS desktop — focused, familiar, and ready to go.</figcaption>
                 </figure>
-            </div>
-            <a class="section-cue section-cue-light" href="#chooser" aria-label="Choose your CalOS image">Choose your image <span aria-hidden="true">↓</span></a>
+            </div>                    <a class="section-cue section-cue-light" href="#chooser" aria-label="Choose your CalOS image">Choose your image <span aria-hidden="true">↓</span></a>
+
         </section>
 
         <section id="chooser" class="chooser" aria-labelledby="chooser-title">
@@ -92,8 +93,89 @@
                     </div>
                 </div>
             </div>
+            <a class="section-cue" href="#artifacthub" aria-label="Explore CalOS on Artifact Hub">Artifact Hub <span aria-hidden="true">↓</span></a>
         </section>
+
+        <section id="artifacthub" class="artifacthub" aria-labelledby="artifacthub-title">
+            <div class="container artifacthub-layout">
+                <div class="artifacthub-copy">
+                    <p class="eyebrow">Open source</p>
+                    <h2 id="artifacthub-title">Built in the open.</h2>
+                    <p>CalOS is free and open source. Browse the source on GitHub, or follow the published container image and its releases on Artifact Hub.</p>
+                    <div class="artifacthub-links">
+                        <a class="artifacthub-link" href="https://github.com/callenflynn/CalOS">View on GitHub <span aria-hidden="true">→</span></a>
+                        <a class="artifacthub-link" href="https://artifacthub.io/packages/container/calos/calos">View package <span aria-hidden="true">→</span></a>
+                    </div>
+                </div>
+                <div class="project-cards">
+                    <a class="artifacthub-card" href="https://github.com/callenflynn/CalOS">
+                        <div class="github-card" id="github-card">
+                            <div class="github-card-header">
+                                <svg class="github-mark" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                                <span class="github-card-title" data-field="full_name">callenflynn/CalOS</span>
+                                <span class="github-card-public">Public</span>
+                            </div>
+                            <p class="github-card-desc" data-field="description">Bluefin based immutable atomic Linux distribution.</p>
+                            <div class="github-card-stats">
+                                <span class="github-card-stat"><strong data-field="stargazers_count">1</strong> stars</span>
+                                <span class="github-card-stat"><strong data-field="forks_count">0</strong> forks</span>
+                                <span class="github-card-stat"><strong data-field="open_issues_count">0</strong> issues</span>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="artifacthub-card">
+                        <div class="artifacthub-widget" data-url="https://artifacthub.io/packages/container/calos/calos" data-theme="dark" data-header="true" data-stars="true" data-responsive="true">
+                            <blockquote>
+                                <p lang="en" dir="ltr"><b>calos</b>: CalOS - A custom Fedora Atomic desktop</p>
+                                &mdash; Open in <a href="https://artifacthub.io/packages/container/calos/calos">Artifact Hub</a>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="site-footer" aria-labelledby="footer-title">
+            <div class="container footer-inner">
+                <div class="footer-copy">
+                    <div class="footer-logo">
+                        <span class="footer-logo-badge">
+                            <svg class="footer-logo-svg" viewBox="0 0 5318 5318" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <rect x="2548" width="2075" height="2838" fill="#050505"/>
+                                <rect x="2548" y="682" width="2770" height="1990" fill="#050505"/>
+                                <circle cx="2659" cy="2659" r="2659" fill="#050505"/>
+                                <circle cx="4625.5" cy="692.5" r="692.5" fill="#050505"/>
+                                <path d="M751.016 2637C751.016 2255.67 829.849 1916.5 987.516 1619.5C1148.85 1318.83 1376.18 1086 1669.52 921C1962.85 752.333 2300.18 668 2681.52 668C3165.52 668 3572.52 798.167 3902.52 1058.5C4232.52 1315.17 4445.18 1665.33 4540.52 2109H3380.02C3310.35 1962.33 3213.18 1850.5 3088.52 1773.5C2967.52 1696.5 2826.35 1658 2665.02 1658C2415.68 1658 2215.85 1747.83 2065.52 1927.5C1918.85 2103.5 1845.52 2340 1845.52 2637C1845.52 2937.67 1918.85 3177.83 2065.52 3357.5C2215.85 3533.5 2415.68 3621.5 2665.02 3621.5C2826.35 3621.5 2967.52 3583 3088.52 3506C3213.18 3429 3310.35 3317.17 3380.02 3170.5H4540.52C4445.18 3614.17 4232.52 3966.17 3902.52 4226.5C3572.52 4483.17 3165.52 4611.5 2681.52 4611.5C2300.18 4611.5 1962.85 4529 1669.52 4364C1376.18 4195.33 1148.85 3962.5 987.516 3665.5C829.849 3364.83 751.016 3022 751.016 2637Z" fill="#FF3B00"/>
+                            </svg>
+                        </span>
+                        <span class="footer-logo-text">CalOS</span>
+                    </div>
+                    <h2 id="footer-title">A Linux desktop that stays out of your way.</h2>
+                    <ul class="footer-contact">
+                        <li>Made by <a href="https://github.com/callenflynn">Callen Flynn</a></li>
+                        <li><a href="mailto:cal@callen.page">cal@callen.page</a></li>
+                    </ul>
+                </div>
+                <nav class="footer-nav" aria-label="Footer">
+                    <ul>
+                        <li><a href="https://github.com/callenflynn/CalOS">Source on GitHub</a></li>
+                        <li><a href="https://github.com/callenflynn/CalOS/issues">Report an issue</a></li>
+                        <li><a href="wiki/">Wiki</a></li>
+                        <li><a href="https://github.com/callenflynn/CalOS/discussions">Discussions</a></li>
+                        <li><a href="https://artifacthub.io/packages/container/calos/calos">Artifact Hub</a></li>
+                        <li><a href="https://sourceforge.net/projects/calos-linux/files/">Downloads</a></li>
+                        <li><a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 License</a></li>
+                    </ul>
+                </nav>
+                <p class="footer-legal">
+                    Copyright &copy; <span id="year"></span> CalOS contributors.
+                    Distributed under the
+                    <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 License</a>.
+                </p>
+            </div>
+        </footer>
     </main>
+    <script async src="https://artifacthub.io/artifacthub-widget.js"></script>
     <script src="latest-release.js"></script>
     <script src="script.js"></script>
 </body>

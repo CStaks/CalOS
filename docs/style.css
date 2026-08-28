@@ -24,9 +24,28 @@ html::-webkit-scrollbar {
 }
 
 body {
+    height: 100%;
+    overflow: hidden;
     background-color: var(--bg-color);
     color: var(--dark-element);
     font-family: 'Poppins', sans-serif;
+}
+
+main {
+    height: 100svh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+main::-webkit-scrollbar {
+    display: none;
+}
+
+main section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 
 .container {
@@ -230,6 +249,285 @@ button:focus-visible {
     font-size: 0.8rem;
 }
 
+.artifacthub {
+    min-height: 100svh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 4rem 0 6rem;
+    background: var(--dark-element);
+    color: #fff7f4;
+}
+
+.artifacthub-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    align-items: center;
+    gap: clamp(3rem, 8vw, 8rem);
+}
+
+.artifacthub-copy {
+    max-width: 480px;
+}
+
+.artifacthub h2 {
+    margin-bottom: 1.25rem;
+    font-size: clamp(2.5rem, 6vw, 4.8rem);
+    letter-spacing: -0.06em;
+    line-height: 0.98;
+}
+
+.artifacthub-copy > p:not(.eyebrow) {
+    margin-bottom: 2rem;
+    color: #d8cbc7;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.artifacthub-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.artifacthub-link {
+    display: inline-flex;
+    gap: 0.7rem;
+    align-items: center;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.artifacthub-link:hover,
+.artifacthub-link:focus-visible {
+    transform: translateX(4px);
+}
+
+.project-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+}
+
+.project-cards .artifacthub-card {
+    display: block;
+}
+
+.project-cards a.artifacthub-card {
+    text-decoration: none;
+}
+
+.artifacthub-card {
+    min-width: 0;
+    padding: clamp(1rem, 2vw, 2rem);
+    background: #1b1919;
+    border: 1px solid #3a302d;
+    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.35);
+}
+
+.project-cards .artifacthub-card {
+    height: 300px;
+}
+
+.artifacthub-widget,
+.github-card {
+    height: 228px;
+    min-height: 228px;
+}
+
+.github-card {
+    display: flex;
+    flex-direction: column;
+    color: #e6edf3;
+    background: #232429;
+    border: 1px solid #3a302d;
+    padding: 1rem 1.2rem;
+}
+
+.github-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: -1rem -1.2rem 1rem;
+    padding: 0.9rem 1.2rem;
+    background: #131317;
+    border-bottom: 1px solid #19181b;
+    color: #58a6ff;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.github-mark {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.github-card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.github-card-public {
+    margin-left: auto;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid #4a4442;
+    border-radius: 999px;
+    color: #d8cbc7;
+    font-size: 0.7rem;
+    font-weight: 400;
+    text-transform: lowercase;
+    white-space: nowrap;
+}
+
+.github-card-desc {
+    color: #d8cbc7;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.github-card-stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.1rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    color: #a99b97;
+    font-size: 0.85rem;
+}
+
+.github-card-stat strong {
+    color: #fff7f4;
+    font-weight: 600;
+}
+
+.artifacthub blockquote {
+    margin: 0;
+    color: #d8cbc7;
+    line-height: 1.7;
+}
+
+.artifacthub blockquote a {
+    color: var(--accent);
+}
+
+.site-footer {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 0;
+    background: var(--dark-element);
+    border-top: 2px solid var(--accent);
+    color: #d8cbc7;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    width: 100%;
+}
+
+.footer-inner {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+.footer-copy h2 {
+    margin-bottom: 1rem;
+    color: #fff7f4;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+}
+
+.footer-logo-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-color);
+}
+
+.footer-logo-svg {
+    width: 26px;
+    height: 26px;
+}
+
+.footer-logo-text {
+    color: var(--accent);
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.footer-contact {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: #a99b97;
+    font-size: 0.9rem;
+    line-height: 1.9;
+}
+
+.site-footer a {
+    position: relative;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.site-footer a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+}
+
+.site-footer a:hover::after,
+.site-footer a:focus-visible::after {
+    transform: scaleX(1);
+}
+
+.footer-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.7rem;
+}
+
+.footer-nav a {
+    color: #d8cbc7;
+}
+
+.footer-legal {
+    grid-column: 1 / -1;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #252322;
+    color: #8f817d;
+    font-size: 0.85rem;
+    line-height: 1.8;
+}
+
 .chooser {
     min-height: 100svh;
     position: relative;
@@ -425,6 +723,24 @@ button:focus-visible {
 
     .screenshot-card {
         transform: rotate(0);
+    }
+
+    .artifacthub {
+        padding: 5rem 0 6rem;
+    }
+
+    .artifacthub-layout {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+
+    .footer-inner {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+
+    .footer-legal {
+        margin-top: 1.5rem;
     }
 
     .chooser {
