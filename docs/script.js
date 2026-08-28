@@ -12,6 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const chooserReset = document.getElementById('chooser-reset');
     const recommendationLink = document.getElementById('recommendation-link');
 
+    document.querySelectorAll('a.js-smooth-scroll').forEach((link) => {
+        link.addEventListener('click', (event) => {
+            const target = document.querySelector(link.getAttribute('href'));
+            if (!target) return;
+            event.preventDefault();
+            history.pushState(null, '', link.getAttribute('href'));
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
     const state = { graphics: '', arch: '', install: '', vm: '' };
     let shouldScrollToChooser = false;
 

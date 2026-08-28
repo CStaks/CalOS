@@ -126,6 +126,13 @@ build $target_image=image_name $tag=default_tag $extra_args="":
     add_label "io.artifacthub.package.keywords" "{{ image_keywords }}"
     LABELS+=("--label" "io.artifacthub.package.license=Apache-2.0")
     add_label "io.artifacthub.package.logo-url" "{{ image_logo_url }}"
+    # Explicitly replace inherited base-image metadata so Artifact Hub cannot
+    # identify the final image as Bluefin after the build.
+    add_label "org.opencontainers.image.title" "{{ image_name }}"
+    add_label "org.opencontainers.image.description" "{{ image_desc }}"
+    add_label "org.opencontainers.image.vendor" "{{ repo_organization }}"
+    add_label "org.opencontainers.image.url" "https://github.com/{{ repo_organization }}/{{ image_name }}"
+    add_label "org.opencontainers.image.source" "https://github.com/{{ repo_organization }}/{{ image_name }}"
     LABELS+=("--label" "io.artifacthub.package.prerelease=false")
     LABELS+=("--label" "org.opencontainers.image.created=$(date -u +%Y\-%m\-%d\T%H\:%M\:%S\Z)")
     add_label "org.opencontainers.image.description" "{{ image_desc }}"
@@ -180,6 +187,18 @@ rechunk $target_image=image_name $tag=default_tag:
 
     CHUNKED_IMAGE="$(podman pull "oci:${CHUNKAH_OUTPUT_DIR}/chunked")"
     podman tag "${CHUNKED_IMAGE}" "${target_image}:${tag}"
+
+    # Chunkah creates a new image config. Re-apply CalOS metadata after
+    # rechunking so Artifact Hub sees CalOS rather than the Bluefin base.
+    podman image prune -f >/dev/null 2>&1 || true
+    podman commit \
+      --change 'LABEL org.opencontainers.image.title=calos' \
+      --change 'LABEL org.opencontainers.image.description=CalOS - A custom Fedora Atomic desktop' \
+      --change 'LABEL org.opencontainers.image.vendor=callenflynn' \
+      --change 'LABEL org.opencontainers.image.url=https://github.com/callenflynn/CalOS' \
+      --change 'LABEL org.opencontainers.image.source=https://github.com/callenflynn/CalOS' \
+      "${target_image}:${tag}" "${target_image}:${tag}-metadata"
+    podman tag "${target_image}:${tag}-metadata" "${target_image}:${tag}"
 
 # Split the image for smaller updates (Classical)!
 ostree-rechunk $target_image=image_name $tag=default_tag:
