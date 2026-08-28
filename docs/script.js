@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const githubBtn = document.getElementById('btn-github');
+    const wikiBtn = document.getElementById('btn-wiki');
     const downloadBtn = document.getElementById('btn-download');
     const questionPanel = document.getElementById('question-panel');
     const stepLabel = document.getElementById('step-label');
@@ -158,6 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     githubBtn?.addEventListener('click', () => {
         window.location.href = 'https://github.com/callenflynn/CalOS';
+    });
+
+    wikiBtn?.addEventListener('click', () => {
+        window.location.href = 'wiki/';
     });
 
     // Initialize without scrolling so URLs such as /#about remain at their target.
