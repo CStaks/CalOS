@@ -199,3 +199,9 @@ primary logo
 B&W
 
 <img src="CalOS/CalOS-bw.png" height=120>
+
+Alternate logos
+
+<img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/CalOS-71aab9.png?raw=true" height=120>
+
+<img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/CalOS-7a899c.png?raw=true" height=120>
