@@ -124,26 +124,15 @@ Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. 
 
 ## Updating
 
-CalOS ships with [just](https://github.com/casey/just) preinstalled and a system-wide
-Justfile, so updating is one command from any terminal:
+CalOS inherits Universal Blue's [ujust](https://docs.projectbluefin.io/administration/) command system, so updating is one command from any terminal:
 
 ```bash
-just update    # check for updates, install them, and reboot to apply
+ujust update    # update the system image, flatpaks, and containers, then reboot
 ```
 
-Other useful commands (aliases in parentheses):
+`ujust` also provides `ujust rollback`, `ujust toggle-updates`, and many other recipes — run `ujust` with no arguments to list them all.
 
-```bash
-just check      # (just c)  check for updates without installing
-just rollback   # (just r)  roll back to the previous version and reboot
-just status     # (just v)  show the deployed image and version
-just info       # (just i)  show system info with the CalOS ASCII logo
-just switch-latest  # switch back to the rolling :latest image and reboot
-```
-
-`just` finds the CalOS Justfile automatically when you run it outside a project
-directory (via `/etc/profile.d/calos.sh`), so `just update` works from anywhere.
-There are also plain aliases if you prefer to skip `just`:
+There are also plain aliases if you prefer to skip `ujust`:
 
 ```bash
 calos-update        # sudo bootc update && sudo reboot

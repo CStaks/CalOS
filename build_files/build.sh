@@ -141,58 +141,11 @@ mkdir -p "$(dirname "$LAZYVIM_SKEL")"
 git clone https://github.com/LazyVim/starter.git "$LAZYVIM_SKEL"
 rm -rf "$LAZYVIM_SKEL/.git"
 
-### Install the CalOS convenience command set
-# The source Justfile is a build/development task file, so ship a small
-# end-user Justfile separately instead of exposing build recipes in releases.
+### Ensure `just` is present (ujust, the Universal Blue command system, needs it)
 "${DNF}" install -y just "${SKIP_MISSING}"
-mkdir -p /usr/share/calos
-cat > /usr/share/calos/Justfile << 'CALOSJUSTEOF'
-# CalOS user commands
-# Run `just` (or `just --list`) to see everything. `just update` is the
-# normal way to keep the system current.
 
-default:
-    @just --list
-
-# Update CalOS to the latest version and reboot to apply it
-update:
-    sudo bootc update
-    sudo reboot
-
-# Check for updates without installing (safe to run any time)
-check:
-    sudo bootc update --check
-
-# Roll back to the previous version and reboot
-rollback:
-    sudo bootc rollback
-    sudo reboot
-
-# Show the deployed image and version
-status:
-    sudo bootc status
-
-# Switch to the rolling latest image (x86_64 standard)
-switch-latest:
-    sudo bootc switch ghcr.io/callenflynn/calos:latest
-    sudo reboot
-
-# Show system info with the CalOS ASCII logo
-info:
-    fastfetch
-
-alias u := update
-alias c := check
-alias r := rollback
-alias v := status
-alias i := info
-CALOSJUSTEOF
-# Keep a copy under /etc/just as a stable system-wide path.
-mkdir -p /etc/just
-cp /usr/share/calos/Justfile /etc/just/Justfile
-
-### Shell environment: starship, zoxide, just fallback, aliases
-# Profile.d script initializes CalOS defaults for every new login shell.
+### Shell environment: starship, zoxide, aliases
+# Profile.d script initializes CalOS defaults for every login shell.
 cat > /etc/profile.d/calos.sh << 'CALOSPROFILEEOF'
 # CalOS - terminal info defaults
 export FASTFETCH_CONFIG=/usr/share/fastfetch/presets/calos.jsonc
@@ -207,22 +160,6 @@ if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init bash)"
 fi
 
-# CalOS - `just`: use the system-wide Justfile when you aren't inside a
-# project that has its own. This makes `just update` work from any directory.
-if command -v just >/dev/null 2>&1; then
-    just() {
-        # `just --list` succeeds only when a local justfile exists; otherwise
-        # fall back to the system-wide CalOS Justfile. (--working-directory
-        # keeps recipes running in the user's cwd, not /usr/share/calos.)
-        if command just --list >/dev/null 2>&1; then
-            command just "$@"
-        else
-            command just --justfile /usr/share/calos/Justfile --working-directory "$PWD" "$@"
-        fi
-    }
-    export -f just 2>/dev/null || true
-fi
-
 # CalOS - handy aliases (no sudo needed, bootc handles it)
 alias calos-update='sudo bootc update && sudo reboot'
 alias calos-rollback='sudo bootc rollback && sudo reboot'
@@ -234,7 +171,7 @@ chmod +x /etc/profile.d/calos.sh
 # which read /etc/bashrc rather than the login profile.
 if [ -f /etc/bashrc ]; then
     if ! grep -q 'calos.sh' /etc/bashrc; then
-        printf '\n# CalOS terminal defaults (just fallback, aliases, prompt)\n[ -f /etc/profile.d/calos.sh ] && . /etc/profile.d/calos.sh\n' >> /etc/bashrc
+        printf '\n# CalOS terminal defaults (aliases, prompt)\n[ -f /etc/profile.d/calos.sh ] && . /etc/profile.d/calos.sh\n' >> /etc/bashrc
     fi
 fi
 
@@ -242,19 +179,8 @@ fi
 if [ -f /etc/zshrc ]; then
     if ! grep -q 'calos' /etc/zshrc; then
         cat >> /etc/zshrc << 'CALOSZSHEOF'
-# CalOS terminal defaults (just fallback, aliases, prompt)
+# CalOS terminal defaults (aliases, prompt)
 export FASTFETCH_CONFIG=/usr/share/fastfetch/presets/calos.jsonc
-
-# CalOS - `just` fallback: system-wide Justfile outside project directories
-if command -v just >/dev/null 2>&1; then
-    just() {
-        if command just --list >/dev/null 2>&1; then
-            command just "$@"
-        else
-            command just --justfile /usr/share/calos/Justfile --working-directory "$PWD" "$@"
-        fi
-    }
-fi
 
 # CalOS - handy aliases (no sudo needed, bootc handles it)
 alias calos-update='sudo bootc update && sudo reboot'
@@ -266,6 +192,7 @@ alias calos-switch-latest='sudo bootc switch ghcr.io/callenflynn/calos:latest &&
 if command -v starship >/dev/null 2>&1; then
     eval "$(starship init zsh)"
 fi
+
 
 # CalOS - Zoxide (zsh)
 if command -v zoxide >/dev/null 2>&1; then

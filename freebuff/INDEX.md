@@ -169,20 +169,20 @@ releases get e.g. "CalOS Superior".
     binaries, and os-release `ID`/`ID_LIKE`/`VERSION_ID` restored from the
     base so bootc-image-builder accepts the image. NVIDIA has no arm64 build
     (no ublue arm64 NVIDIA base).
-12. **End users get a separate, small Justfile** (`/usr/share/calos/Justfile`,
-    also copied to `/etc/just/`) with `just update` / `check` / `rollback` /
-    `status` / `info` / `switch-latest` plus aliases (`u`, `c`, `r`, `v`, `i`).
-    `/etc/profile.d/calos.sh` installs a `just` shell function that falls back
-    to that Justfile outside project directories (probe: `just --list`
-    succeeds only when a local justfile exists; the fallback passes
-    `--working-directory "$PWD"` so recipes run in the user's cwd), so `just
-    update` works from anywhere. The same fallback is appended to `/etc/zshrc`
-    for zsh users. The repo-root `Justfile` is the *developer* task file and is
-    not shipped to users.
-    > **History:** an earlier build.sh had a typo'd heredoc delimiter
-    > (`CALOSPROFEOF` vs `CALOSPROFILEEOF`) that swallowed the rest of the
-    > script into `/etc/profile.d/calos.sh`, so the function never got
-    > installed — fixed.
+12. **No custom end-user Justfile is shipped.** Updates use Universal Blue's
+    `ujust update` (inherited from Bluefin — updates system image, flatpaks,
+    and containers). `build.sh` only ensures the `just` binary is present
+    (ujust needs it) and writes `/etc/profile.d/calos.sh` with the
+    `calos-update` / `calos-rollback` / `calos-version` /
+    `calos-switch-latest` aliases (sourced from `/etc/bashrc` + `/etc/zshrc`
+    too). The repo-root `Justfile` is the *developer* task file and is not
+    shipped to users.
+    > **History:** an earlier build.sh shipped a custom end-user Justfile to
+    > `/usr/share/calos/Justfile` + `/etc/just/` with a `just` shell-function
+    > fallback so `just update` worked anywhere — removed as redundant once
+    > Bluefin's `ujust` was confirmed to provide `ujust update` (it also had a
+    > typo'd heredoc delimiter `CALOSPROFEOF` vs `CALOSPROFILEEOF` that
+    > swallowed the rest of the script — fixed).
 13. **Starship + Zed downloads in `build.sh` are arch-aware** (x86_64 vs
     aarch64 tarballs) so the ARM64 build works; `atim/lazygit` and
     `scottames/ghostty` COPRs both publish aarch64 builds (verified).

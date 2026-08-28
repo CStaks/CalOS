@@ -64,9 +64,10 @@ so CalOS values win when both sets apply.
 CalOS-themed segmented prompt: `calos` OS chip, username, truncated git-aware
 directory, git branch/status, command duration; accent `#FF3B00`, success symbol
 `❯` in accent, error in red. Enabled for new users via `/etc/profile.d/calos.sh`
-(bash only — see INDEX gotcha #9). The same profile script installs the `just`
-fallback function and the `calos-update` / `calos-rollback` / `calos-version`
-aliases so `just update` works from any directory.
+(bash only — see INDEX gotcha #9). The same profile script installs the
+`calos-update` / `calos-rollback` / `calos-version` / `calos-switch-latest`
+aliases. System updates use Universal Blue's `ujust update` (inherited from
+Bluefin), so no custom Justfile is shipped.
 
 ### Terminal info tools
 - `usr/share/fastfetch/calos-logo.txt` — the ASCII CalOS logo (source of truth).
