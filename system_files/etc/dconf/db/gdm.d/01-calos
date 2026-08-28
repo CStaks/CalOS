@@ -1,6 +1,11 @@
 [org.gnome.login-screen]
 logo='/usr/share/pixmaps/CalOS.svg'
 
+# CalOS wallpaper on the login screen (compiled into the gdm dconf database)
+[org.gnome.desktop.background]
+picture-uri='file:///usr/share/backgrounds/calos/night-iceberg.png'
+picture-uri-dark='file:///usr/share/backgrounds/calos/night-iceberg.png'
+
 [org.gnome.shell.extensions.logo-menu]
 use-custom-icon=true
 custom-icon-path='/usr/share/pixmaps/CalOS-bw.png'

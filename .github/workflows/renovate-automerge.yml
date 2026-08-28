@@ -2,7 +2,9 @@ name: Renovate Auto-merge
 
 on:
   workflow_run:
-    workflows: ["PR Validation — testsuite"]
+    # Wait for a real PR-check workflow to finish before deciding whether to
+    # auto-merge the Renovate PR (the reusable action re-checks all checks).
+    workflows: ["Hadolint"]
     types: [completed]
 
 permissions:

@@ -9,32 +9,43 @@
 - **What it is:** CalOS — a custom Fedora Atomic (bootc) desktop operating system
   image layered on top of a Fedora Atomic base image.
 - **How it's distributed:** OCI container images pushed to GHCR
-  (`ghcr.io/callenflynn/calos` and `:latest-nvidia`), consumed via
-  `sudo bootc switch ghcr.io/callenflynn/calos:latest`.
+  (`ghcr.io/callenflynn/calos:latest`, `:latest-arm64`, `:latest-nvidia`),
+  consumed via `sudo bootc switch ghcr.io/callenflynn/calos:latest`.
+- **Architectures:** x86_64 (default) and ARM64. The ARM64 variant builds on
+  the Bluefin LTS arm64 tag (`bluefin:lts-testing-arm64`) because Bluefin's
+  `stable` tag is x86_64 only; the NVIDIA variant is x86_64 only (no arm64
+  NVIDIA base exists from ublue-os).
 - **How it's built:** a single `Containerfile` + `build_files/build.sh`, driven by
-  `Justfile` recipes, built daily in GitHub Actions and signed with Cosign.
+  `Justfile` recipes, built daily in CI (on `ubuntu-24.04` for amd64 and
+  `ubuntu-24.04-arm` for arm64) and signed with Cosign.
 - **Disk images:** qcow2 + vmdk (VM) and anaconda-iso (installer) built daily
-  via bootc-image-builder and published to SourceForge
-  (https://sourceforge.net/projects/calos-linux/).
+  for both archs via bootc-image-builder and published to SourceForge
+  (https://sourceforge.net/projects/calos-linux/). Files are named
+  `calos-<version>_<arch>[<variant>].<ext>` (e.g. `calos-v1.1.4_x86_64.qcow2`,
+  `calos-v1.1.4_arm64.iso`, `calos-v1.1.4_x86_64-nvidia.iso`; `latest` on the
+  rolling channel).
 - **License:** Apache-2.0.
 - **Repo size:** 54 tracked files (mostly text config + branding assets).
 
 ## The Build Chain (one paragraph)
 
-GitHub Actions (`build.yml`) builds a matrix of two variants — **standard**
-(base `ghcr.io/ublue-os/bluefin:stable`) and **nvidia** (base
+GitHub Actions (`build.yml`) builds a matrix of three image combos —
+**standard/amd64** (base `ghcr.io/ublue-os/bluefin:stable`), **standard/arm64**
+(base `ghcr.io/ublue-os/bluefin:lts-testing-arm64`) and **nvidia/amd64** (base
 `ghcr.io/ublue-os/bluefin-nvidia-open:stable`) — by passing `BASE_IMAGE` as a
-build arg. `Containerfile` stages `build_files/` + `system_files/` into a `ctx`
-stage, then runs `build.sh` inside the base image. `build.sh` removes inherited vendor
-branding + VSCode/Firefox/GNOME Terminal, installs CalOS's app set (Zed, Brave,
-Ghostty, Neovim+LazyVim, starship), and overlays `system_files/` onto `/` (the
-CalOS brand layer: os-release, GRUB, Plymouth, GDM, wallpapers, dock, shell
-prompt). Images are rechunked with rpm-ostree for smaller deltas, tagged, pushed
-to GHCR, and signed. A second workflow (`build-disk.yml`) turns the container
-images into qcow2/ISO artifacts with bootc-image-builder. On a `v*` tag push,
+build arg, on `ubuntu-24.04` (amd64) and `ubuntu-24.04-arm` (arm64) runners.
+`Containerfile` stages `build_files/` + `system_files/` into a `ctx`
+stage, then runs `build.sh` inside the base image. `build.sh` removes inherited
+vendor branding + VSCode/Firefox/GNOME Terminal, installs CalOS's app set (Zed,
+Brave, Ghostty, Neovim+LazyVim, starship), and overlays `system_files/` onto
+`/` (the CalOS brand layer: os-release, GRUB, Plymouth, GDM, wallpapers, dock,
+shell prompt). Images are rechunked with rpm-ostree for smaller deltas, tagged
+(`latest`, `latest-arm64`, `latest-nvidia`), pushed to GHCR, and signed. A
+second workflow (`build-disk.yml`) turns the container images into qcow2/ISO
+artifacts with bootc-image-builder for both archs. On a `v*` tag push,
 `build-disk.yml` first builds versioned container images
-(`ghcr.io/<owner>/calos:v1.2.0[-nvidia]`) with the release codename (from
-`build_files/codenames.sh`) stamped into os-release, then builds the disk
+(`ghcr.io/<owner>/calos:v1.2.0[-arm64][-nvidia]`) with the release codename
+(from `build_files/codenames.sh`) stamped into os-release, then builds the disk
 images from those same versioned images — so both bootc users and ISO/VM
 releases get e.g. "CalOS Superior".
 
@@ -45,8 +56,9 @@ releases get e.g. "CalOS Superior".
 ├── Containerfile                  # Multi-stage build; ctx stage + base image + lint
 ├── Justfile                       # All local dev recipes (build, rechunk, VM, lint)
 ├── README.md                      # User-facing docs: variants, install, what's included
+├── CONTRIBUTING.md                # Contributor guide (fork, PR process, style)
+├── SECURITY.md                    # Supported versions + advisory reporting
 ├── LICENSE                        # Apache-2.0
-├── artifacthub-repo.yml           # ArtifactHub indexing (PLACEHOLDER values)
 ├── cosign.pub                     # Public key for verifying signed images
 ├── image-template.env             # Build config consumed by Justfile (dotenv)
 ├── .gitignore                     # cosign.key, _build_*, output, *_chunkah_*
@@ -56,10 +68,12 @@ releases get e.g. "CalOS Superior".
 │   ├── dependabot.yml             # Weekly github-actions updates
 │   ├── renovate.json5             # Renovate best-practices; automerge pins
 │   └── workflows/
-│       ├── build.yml              # Main CI: build/push/sign both variants daily
-│       ├── build-disk.yml         # qcow2/iso/vmdk via bootc-image-builder → SourceForge (+ GitHub Release on v* tags)
+│       ├── build.yml              # Main CI: build/push/sign standard (amd64+arm64) + nvidia (amd64) daily
+│       ├── build-disk.yml         # qcow2/iso/vmdk (amd64+arm64) via bootc-image-builder → SourceForge (+ GitHub Release on v* tags)
 │       ├── codeql.yml             # CodeQL on actions language
-│       ├── hadolint.yml           # Containerfile lint│   └── renovate-automerge.yml # Shared Renovate auto-merge trigger
+│       ├── hadolint.yml           # Containerfile lint
+│       ├── renovate-automerge.yml # Renovate auto-merge (waits on Hadolint)
+│       └── notify-discord.yml     # Shared Discord notifications
 │
 ├── build_files/
 │   ├── build.sh                   # THE install/branding script (runs in image build; stamps release codename when CALOS_VERSION/CODENAME args set)
@@ -84,13 +98,13 @@ releases get e.g. "CalOS Superior".
     │       ├── neofetch/config.conf     # neofetch → same ASCII art
     │       └── starship.toml            # CalOS-themed prompt (brand colors)
     └── usr/
-        ├── lib/os-release         # CalOS identity (VERSION_ID=41)
+        ├── lib/os-release         # CalOS identity (VERSION_ID restored from base at build)
         ├── share/
         │   ├── backgrounds/calos/       # Wallpaper copies installed to system
         │   ├── fastfetch/               # calos-logo.txt + presets/calos.jsonc
-        │   ├── glib-2.0/schemas/90_calos.gschema.override  # dock, wallpaper, logo, terminal
+        │   ├── glib-2.0/schemas/zz_calos.gschema.override  # dock, wallpaper, logo, terminal (sorts after Bluefin's zz1-* so CalOS wins)
         │   ├── pixmaps/                 # Logo copies (GDM login logo)
-        │   └── plymouth/themes/calos/   # Boot splash (dark + #FF3B00 spinner)
+        │   └── plymouth/themes/calos/   # Boot splash (dark + #FF3B00 pulsing dots, real script API)
 ```
 
 ## Key Facts & Connections
@@ -105,7 +119,7 @@ releases get e.g. "CalOS Superior".
 | CI container build + push + sign | `.github/workflows/build.yml` |
 | CI disk image build + publish (SourceForge; GitHub Release on `v*` tags) | `.github/workflows/build-disk.yml` |
 | Build config (image name, org, tags) | `image-template.env` |
-| Variant parameterization | `ARG BASE_IMAGE` in `Containerfile` + CI matrix |
+| Variant/arch parameterization | `ARG BASE_IMAGE` in `Containerfile` + CI matrix (standard amd64/arm64, nvidia amd64) |
 
 ## Brand Quick Reference
 
@@ -119,26 +133,50 @@ releases get e.g. "CalOS Superior".
 1. **Owner references:** the build configuration and OS metadata use the real
    repository owner, **callenflynn (Callen Flynn)**. `Notsk` was removed as a
    stale Windows-machine username.
-2. **`artifacthub-repo.yml` is placeholder** (`my-custom-id-here`, "My Name") —
-   ArtifactHub indexing is not actually configured.
+2. **`artifacthub-repo.yml` was removed** (it was 100% template placeholder).
+   ArtifactHub metadata still ships as OCI labels from the Justfile build
+   recipe; re-add the file only if ArtifactHub indexing is actually set up.
 3. **ISO recipes use `disk_config/iso-gnome.toml`.** The KDE config remains
    available as an alternate, but the default local ISO path now matches CI.
 4. **`iso-kde.toml` is unused by CI** — `build-disk.yml` only ever passes
    `iso-gnome.toml` for `anaconda-iso`.
-5. **`renovate-automerge.yml` waits on a workflow named "PR Validation —
-   testsuite"** that does not exist in this repo (leftover from the ublue
-   template), so its automerge job never fires.
-6. **`build.yml` concurrency group references `inputs.brand_name` /
-   `inputs.stream_name`** which are not declared inputs (harmless, from template).
-7. **`os-release` pins `VERSION_ID=41`** even though the base is `bluefin:stable`
-   (rolling) — will go stale as Fedora bumps. `build.sh` deliberately removes
-   the base image's os-release first so this override wins.
+5. **`renovate-automerge.yml` now waits on `Hadolint`** (a real PR workflow)
+   — the previous "PR Validation — testsuite" name from the ublue template
+   never existed here, so automerge never fired.
+6. **`build.yml` concurrency group no longer references undeclared inputs**
+   (`inputs.brand_name`/`inputs.stream_name` were template leftovers).
+7. **`os-release` no longer pins a stale `VERSION_ID`** — `build.sh` captures
+   the base image's `VERSION_ID` before overlaying `system_files/` and
+   restores it after, so the committed file is a placeholder that never goes
+   stale. Rolling builds keep the generic `VERSION`/`PRETTY_NAME`; versioned
+   tag builds stamp codename values.
 8. **`cosign.pub` is committed but `cosign.key` is gitignored** — signing key must
    live in the `SIGNING_SECRET` repo secret; public key in repo for verification.
 9. **Starship only initializes for bash** (`/etc/profile.d/calos.sh`) — no zsh
    init despite README mention of bash *and* zsh.
 10. **LazyVim is cloned at build time from `main`** (unpinned) into `/etc/skel`,
     so every new user gets the starter config; first launch installs plugins.
+11. **ARM64 tracks the Bluefin LTS arm64 tag** (`bluefin:lts-testing-arm64`)
+    and is published as `:latest-arm64` / `:vX.Y.Z-arm64` — it is NOT merged
+    into the `:latest` tag because the amd64 and arm64 bases are different
+    Fedora branches. NVIDIA has no arm64 build (no ublue arm64 NVIDIA base).
+12. **End users get a separate, small Justfile** (`/usr/share/calos/Justfile`,
+    also copied to `/etc/just/`) with `just update` / `check` / `rollback` /
+    `status` / `info` / `switch-latest` plus aliases (`u`, `c`, `r`, `v`, `i`).
+    `/etc/profile.d/calos.sh` installs a `just` shell function that falls back
+    to that Justfile outside project directories (probe: `just --list`
+    succeeds only when a local justfile exists; the fallback passes
+    `--working-directory "$PWD"` so recipes run in the user's cwd), so `just
+    update` works from anywhere. The same fallback is appended to `/etc/zshrc`
+    for zsh users. The repo-root `Justfile` is the *developer* task file and is
+    not shipped to users.
+    > **History:** an earlier build.sh had a typo'd heredoc delimiter
+    > (`CALOSPROFEOF` vs `CALOSPROFILEEOF`) that swallowed the rest of the
+    > script into `/etc/profile.d/calos.sh`, so the function never got
+    > installed — fixed.
+13. **Starship + Zed downloads in `build.sh` are arch-aware** (x86_64 vs
+    aarch64 tarballs) so the ARM64 build works; `atim/lazygit` and
+    `scottames/ghostty` COPRs both publish aarch64 builds (verified).
 
 ## Detail Docs
 

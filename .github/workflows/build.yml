@@ -20,21 +20,33 @@ env:
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-${{ inputs.brand_name}}-${{ inputs.stream_name }}
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
   build_push:
-    name: Build ${{ matrix.variant.name }}
-    runs-on: ubuntu-24.04
+    name: Build ${{ matrix.name }} (${{ matrix.platform }})
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        variant:
+        include:
           - name: standard
+            platform: amd64
+            runner: ubuntu-24.04
             suffix: ""
             base_image: "ghcr.io/ublue-os/bluefin:stable"
+          # ARM64 tracks the Bluefin LTS arm64 tag — Bluefin's `stable` tag is
+          # x86_64 only. There is no arm64 NVIDIA base image from ublue-os, so
+          # the nvidia variant builds for x86_64 only.
+          - name: standard
+            platform: arm64
+            runner: ubuntu-24.04-arm
+            suffix: "-arm64"
+            base_image: "ghcr.io/ublue-os/bluefin:lts-testing-arm64"
           - name: nvidia
+            platform: amd64
+            runner: ubuntu-24.04
             suffix: "-nvidia"
             base_image: "ghcr.io/ublue-os/bluefin-nvidia-open:stable"
 
@@ -69,7 +81,7 @@ jobs:
       - name: Default Tag
         id: gen-default-tag
         run: |
-          DEFAULT_TAG="$(just generate-default-tag)${{ matrix.variant.suffix }}"
+          DEFAULT_TAG="$(just generate-default-tag)${{ matrix.suffix }}"
 
           echo "DEFAULT_TAG=${DEFAULT_TAG}" >> $GITHUB_ENV
 
@@ -86,7 +98,7 @@ jobs:
           sudo -E $(command -v just) build \
             ${IMAGE_NAME} \
             ${DEFAULT_TAG} \
-            "BASE_IMAGE=${{ matrix.variant.base_image }}"
+            "BASE_IMAGE=${{ matrix.base_image }}"
 
       # This is optional, this provides smaller delta updates
       - name: Rechunk with rpm-ostree
