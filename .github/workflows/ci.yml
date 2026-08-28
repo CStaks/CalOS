@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Run Zizmor
-        uses: woodruffw/zizmor-github-action@v1
+        uses: zizmorcore/zizmor-action@v1
 
   notify:
     name: Notify Discord
