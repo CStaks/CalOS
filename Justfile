@@ -188,17 +188,22 @@ rechunk $target_image=image_name $tag=default_tag:
     CHUNKED_IMAGE="$(podman pull "oci:${CHUNKAH_OUTPUT_DIR}/chunked")"
     podman tag "${CHUNKED_IMAGE}" "${target_image}:${tag}"
 
-    # Chunkah creates a new image config. Re-apply CalOS metadata after
-    # rechunking so Artifact Hub sees CalOS rather than the Bluefin base.
+    # Chunkah creates a new image config. Re-apply CalOS metadata using an
+    # image-to-image copy; `podman commit` only accepts containers, not images.
+    METADATA_IMAGE="${target_image}:${tag}-metadata"
     podman image prune -f >/dev/null 2>&1 || true
-    podman commit \
-      --change 'LABEL org.opencontainers.image.title=calos' \
-      --change 'LABEL org.opencontainers.image.description=CalOS - A custom Fedora Atomic desktop' \
-      --change 'LABEL org.opencontainers.image.vendor=callenflynn' \
-      --change 'LABEL org.opencontainers.image.url=https://github.com/callenflynn/CalOS' \
-      --change 'LABEL org.opencontainers.image.source=https://github.com/callenflynn/CalOS' \
-      "${target_image}:${tag}" "${target_image}:${tag}-metadata"
-    podman tag "${target_image}:${tag}-metadata" "${target_image}:${tag}"
+    podman image scp \
+      "containers-storage:[${target_image}:${tag}]" \
+      "containers-storage:[${METADATA_IMAGE}]"
+    for label in \
+      "org.opencontainers.image.title=calos" \
+      "org.opencontainers.image.description=CalOS - A custom Fedora Atomic desktop" \
+      "org.opencontainers.image.vendor=callenflynn" \
+      "org.opencontainers.image.url=https://github.com/callenflynn/CalOS" \
+      "org.opencontainers.image.source=https://github.com/callenflynn/CalOS"; do
+        podman image set --label "${label}" "${METADATA_IMAGE}"
+    done
+    podman tag "${METADATA_IMAGE}" "${target_image}:${tag}"
 
 # Split the image for smaller updates (Classical)!
 ostree-rechunk $target_image=image_name $tag=default_tag:
