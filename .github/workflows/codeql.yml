@@ -35,6 +35,15 @@ jobs:
 
       # CalOS has no compiled application; analyze JavaScript and Actions directly.
       - name: Perform CodeQL Analysis
+        id: analyze
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
+
+      - name: Write analysis report
+        if: always()
+        run: |
+          {
+            echo "CodeQL language: ${{ matrix.language }}"
+            echo "Analysis result: ${{ steps.analyze.outcome }}"
+          } >> "$GITHUB_STEP_SUMMARY"
