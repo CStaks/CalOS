@@ -4,6 +4,18 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**/README.md'
+      - '**/SUPPORT.md'
+      - '**/LICENSE'
+      - '**/CONTRIBUTING.md'
+      - '**/CODE_OF_CONDUCT.md'
+      - '**/SECURITY.md'
+      - '/docs/**'
+      - '/CalOS/**'
+      - '/.github/ISSUE_TEMPLATE/**'
+      - '/freebuff/**'
+      - '/Justfile'
   schedule:
     - cron: '05 10 * * *'  # 10:05am UTC everyday
   push:
