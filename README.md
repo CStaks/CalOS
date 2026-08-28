@@ -112,7 +112,7 @@ sudo bootc switch ghcr.io/callenflynn/calos:v1.1.4-nvidia
 
 Reboot to apply. For the rolling channel, `bootc update` checks the selected CalOS `:latest` image and stages updates for the next reboot. Versioned tags such as `:v1.1.1` are pinned and do not move automatically.
 
-## Disk images
+## Disk Images
 
 Prebuilt qcow2 + vmdk (VMs) and anaconda-iso (USB/installer) images are built daily for both **x86_64** and **ARM64** and published automatically to the [SourceForge project files](https://sourceforge.net/projects/calos-linux/):
 
@@ -172,7 +172,7 @@ Need help or have questions? See [SUPPORT.md](SUPPORT.md) for where to ask quest
 
 # Screenshots
 
-v1.1.0 desktop
+v1.1.0 Desktop
 
 <img src="CalOS/v1.1.0-desktop-screenshot-1.webp" height=240>
 
@@ -190,7 +190,7 @@ v1.1.0 desktop
 
 ## Logos
 
-primary logo
+Primary Logo
 
 <img src="CalOS/CalOS.png" height=120>
 
@@ -200,6 +200,6 @@ B&W
 
 <img src="CalOS/CalOS-bw.png" height=120>
 
-Alternate logos
+Alternate Logos
 
 <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/CalOS-71aab9.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/CalOS-7a899c.png?raw=true" height=120>
