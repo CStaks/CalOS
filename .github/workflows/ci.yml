@@ -1,0 +1,54 @@
+name: Repository Security & Linting
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  hadolint:
+    name: Lint Containerfile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Containerfile
+
+  shellcheck:
+    name: Lint Shell Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@v2.0.0
+
+  zizmor:
+    name: Lint Workflows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Zizmor
+        uses: woodruffw/zizmor-action@v1
+
+  notify:
+    name: Notify Discord
+    needs: [hadolint, shellcheck, zizmor]
+    if: ${{ always() }}
+    uses: ./.github/workflows/notify-discord.yml
+    with:
+      workflow_name: ${{ github.workflow }}
+      status: ${{ (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) && 'failure' || 'success' }}
+      run_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      ref_name: ${{ github.ref_name }}
+      sha: ${{ github.sha }}
+      event_name: ${{ github.event_name }}
+    secrets: inherit
