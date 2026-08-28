@@ -10,19 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const recommendationCopy = document.getElementById('recommendation-copy');
     const chooserReset = document.getElementById('chooser-reset');
     const recommendationLink = document.getElementById('recommendation-link');
-    let graphicsChoice = '';
 
-    if (githubBtn) {
-        githubBtn.addEventListener('click', () => {
-            window.location.href = 'https://github.com/callenflynn/CalOS';
-        });
-    }
+    const state = { graphics: '', arch: '', install: '', vm: '' };
 
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', () => {
-            document.getElementById('chooser')?.scrollIntoView({ behavior: 'smooth' });
-        });
-    }
+    const show = (el) => el?.classList.remove('is-hidden');
+    const hide = (el) => el?.classList.add('is-hidden');
+
+    // NVIDIA builds are x86_64 only, so the NVIDIA path has one fewer question.
+    const totalSteps = () => (state.graphics === 'nvidia' ? 3 : 4);
 
     const renderQuestion = (label, title, choices) => {
         if (!stepLabel || !questionTitle || !choiceGrid) return;
@@ -32,63 +27,118 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.className = 'choice';
             button.textContent = text;
-            if (attributes) Object.entries(attributes).forEach(([key, value]) => button.dataset[key] = value);
+            if (attributes) Object.entries(attributes).forEach(([key, value]) => (button.dataset[key] = value));
             const span = document.createElement('span');
             span.textContent = detail;
             button.append(span);
             return button;
         }));
-        questionPanel?.classList.remove('is-hidden');
+        show(questionPanel);
         hide(recommendation);
         questionPanel?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
-    const show = (element) => element?.classList.remove('is-hidden');
-    const hide = (element) => element?.classList.add('is-hidden');
+    const askGraphics = () => {
+        renderQuestion(`Question 1 of ${totalSteps()}`, 'What graphics card do you have?', [
+            { text: 'AMD or Intel', detail: 'Use the Standard build', attributes: { graphics: 'standard' } },
+            { text: 'NVIDIA', detail: 'Use the NVIDIA build (x86_64 only)', attributes: { graphics: 'nvidia' } },
+        ]);
+    };
+
+    const askArch = () => {
+        renderQuestion(`Question 2 of ${totalSteps()}`, 'What kind of computer is it?', [
+            { text: 'x86_64', detail: 'Intel or AMD — what most computers have', attributes: { arch: 'x86_64' } },
+            { text: 'ARM64', detail: 'Apple Silicon, Raspberry Pi-style boards, and other ARM systems', attributes: { arch: 'arm64' } },
+        ]);
+    };
+
+    const askInstall = () => {
+        const step = state.graphics === 'nvidia' ? 2 : 3;
+        renderQuestion(`Question ${step} of ${totalSteps()}`, 'Are you installing on hardware or in a VM?', [
+            { text: 'Hardware', detail: 'Install from an ISO', attributes: { install: 'hardware' } },
+            { text: 'Virtual machine', detail: 'Choose QCOW2 or VMDK next', attributes: { install: 'vm' } },
+        ]);
+    };
+
+    const askVm = () => {
+        const step = state.graphics === 'nvidia' ? 3 : 4;
+        const choices = state.graphics === 'nvidia'
+            ? [{ text: 'QEMU or GNOME Boxes', detail: 'Download QCOW2 (NVIDIA VMDK is not available)', attributes: { vm: 'qcow2' } }]
+            : [
+                { text: 'QEMU or GNOME Boxes', detail: 'Download QCOW2', attributes: { vm: 'qcow2' } },
+                { text: 'VMware', detail: 'Download VMDK', attributes: { vm: 'vmdk' } },
+            ];
+        renderQuestion(`Question ${step} of ${totalSteps()}`, 'Which virtual machine software?', choices);
+    };
+
+    // Disk files are named calos-<version>_<arch>[<variant>].<ext>, e.g.
+    // calos-v1.1.4_x86_64.qcow2, calos-v1.1.4_arm64.iso,
+    // calos-v1.1.4_x86_64-nvidia.iso.
+    const diskFile = (arch, variant, ext) =>
+        `calos-v${window.CALOS_LATEST_RELEASE || '1.1.4'}_${arch}${variant === 'nvidia' ? '-nvidia' : ''}.${ext}`;
+
+    const recommend = () => {
+        let title, copy, filename;
+
+        if (state.install === 'hardware') {
+            if (state.graphics === 'nvidia') {
+                title = 'NVIDIA ISO (x86_64)';
+                copy = 'For NVIDIA graphics on real hardware. This ISO includes the NVIDIA build — x86_64 only.';
+                filename = diskFile('x86_64', 'nvidia', 'iso');
+            } else if (state.arch === 'arm64') {
+                title = 'Standard ISO (ARM64)';
+                copy = 'For ARM64 hardware (Apple Silicon, Raspberry Pi-style boards). This is the normal CalOS build for ARM.';
+                filename = diskFile('arm64', 'standard', 'iso');
+            } else {
+                title = 'Standard ISO (x86_64)';
+                copy = 'For AMD or Intel graphics on real hardware. This is the normal CalOS build.';
+                filename = diskFile('x86_64', 'standard', 'iso');
+            }
+        } else if (state.vm === 'vmdk') {
+            // VMDK is Standard-only (no NVIDIA VMDK); supported for both archs.
+            title = state.arch === 'arm64' ? 'Standard VMDK (ARM64)' : 'Standard VMDK (x86_64)';
+            copy = 'For VMware machines, VMware virtualizes the GPU, so use this file for NVIDIA, AMD, or Intel hosts.';
+            filename = state.arch === 'arm64' ? diskFile('arm64', 'standard', 'vmdk') : diskFile('x86_64', 'standard', 'vmdk');
+        } else if (state.graphics === 'nvidia') {
+            title = 'NVIDIA QCOW2 (x86_64)';
+            copy = 'NVIDIA QCOW2 for QEMU or GNOME Boxes virtual machines. NVIDIA builds are x86_64 only.';
+            filename = diskFile('x86_64', 'nvidia', 'qcow2');
+        } else if (state.arch === 'arm64') {
+            title = 'Standard QCOW2 (ARM64)';
+            copy = 'Standard ARM64 QCOW2 for QEMU or GNOME Boxes virtual machines.';
+            filename = diskFile('arm64', 'standard', 'qcow2');
+        } else {
+            title = 'Standard QCOW2 (x86_64)';
+            copy = 'Standard QCOW2 for QEMU or GNOME Boxes virtual machines.';
+            filename = diskFile('x86_64', 'standard', 'qcow2');
+        }
+        showRecommendation(title, copy, filename);
+    };
 
     choiceGrid?.addEventListener('click', (event) => {
         const button = event.target.closest('button');
         if (!button) return;
         if (button.dataset.graphics) {
-            graphicsChoice = button.dataset.graphics;
-            renderQuestion('Question 2 of 2', 'Are you installing on hardware or in a VM?', [
-                { text: 'Hardware', detail: 'Install from an ISO', attributes: { install: 'hardware' } },
-                { text: 'Virtual machine', detail: 'Choose QCOW2 or VMDK next', attributes: { install: 'vm' } },
-            ]);
-        } else if (button.dataset.install === 'vm') {
-            renderQuestion('One last choice', 'Which virtual machine software?', [
-                { text: 'QEMU or GNOME Boxes', detail: 'Download QCOW2', attributes: { vm: 'qcow2' } },
-                { text: 'VMware', detail: 'Download VMDK', attributes: { vm: 'vmdk' } },
-            ]);
-        } else if (button.dataset.install === 'hardware') {
-            showRecommendation(
-                graphicsChoice === 'nvidia' ? 'NVIDIA ISO' : 'Standard ISO',
-                graphicsChoice === 'nvidia'
-                    ? 'For NVIDIA graphics on real hardware. This ISO includes the NVIDIA build.'
-                    : 'For AMD or Intel graphics on real hardware. This is the normal CalOS build.',
-                graphicsChoice === 'nvidia' ? 'nvidia-install.iso' : 'standard-install.iso',
-            );
+            state.graphics = button.dataset.graphics;
+            state.arch = state.install = state.vm = '';
+            if (state.graphics === 'nvidia') askInstall();
+            else askArch();
+        } else if (button.dataset.arch) {
+            state.arch = button.dataset.arch;
+            askInstall();
+        } else if (button.dataset.install) {
+            state.install = button.dataset.install;
+            if (state.install === 'vm') askVm();
+            else recommend();
         } else if (button.dataset.vm) {
-            const format = button.dataset.vm === 'vmdk' ? 'VMDK' : 'QCOW2';
-            const gpu = graphicsChoice === 'nvidia' ? 'NVIDIA' : 'Standard';
-            showRecommendation(
-                `${gpu} ${format}`,
-                button.dataset.vm === 'vmdk'
-                    ? 'Standard VMDK for VMware virtual machines. VMware virtualizes the GPU, so use this file for NVIDIA, AMD, or Intel hosts.'
-                    : `${gpu} QCOW2 for QEMU or GNOME Boxes virtual machines.`,
-                button.dataset.vm === 'vmdk'
-                    ? 'standard-disk.vmdk'
-                    : `${graphicsChoice === 'nvidia' ? 'nvidia' : 'standard'}-disk.qcow2`,
-            );
+            state.vm = button.dataset.vm;
+            recommend();
         }
     });
 
     chooserReset?.addEventListener('click', () => {
-        graphicsChoice = '';
-        renderQuestion('Question 1 of 2', 'What graphics card do you have?', [
-            { text: 'AMD or Intel', detail: 'Use the Standard build', attributes: { graphics: 'standard' } },
-            { text: 'NVIDIA', detail: 'Use the NVIDIA build', attributes: { graphics: 'nvidia' } },
-        ]);
+        state.graphics = state.arch = state.install = state.vm = '';
+        askGraphics();
     });
 
     function showRecommendation(title, copy, filename) {
@@ -96,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recommendationTitle.textContent = `Recommended: ${title}`;
         recommendationCopy.textContent = copy;
         if (recommendationLink && filename) {
-            const latestRelease = window.CALOS_LATEST_RELEASE || '1.1.3';
+            const latestRelease = window.CALOS_LATEST_RELEASE || '1.1.4';
             const sourceForgeUrl = `https://sourceforge.net/projects/calos-linux/files/${latestRelease}/${encodeURIComponent(filename)}/download`;
             recommendationLink.href = sourceForgeUrl;
             recommendationLink.textContent = 'Download from SourceForge →';
@@ -106,4 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
         recommendationLink?.focus();
         recommendation.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+
+    // Render the first question on load (also keeps the step label accurate
+    // for the NVIDIA path, which has one fewer question).
+    askGraphics();
 });

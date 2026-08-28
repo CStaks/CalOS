@@ -20,12 +20,17 @@ fastfetch/neofetch, starship, and wallpapers.
 
 ### Identity (`usr/lib/os-release`)
 ```
-NAME="CalOS"  ID="calos"  VERSION="1.0 (CalOS)"  VERSION_ID="41"
-PRETTY_NAME="CalOS"  HOME_URL/SUPPORT_URL/BUG_REPORT_URL → github.com/callenflynn/CalOS
+NAME="CalOS"  ID="fedora"  ID_LIKE="fedora"  VERSION="CalOS"  VERSION_ID="43"
+PRETTY_NAME="CalOS"  LOGO="/usr/share/pixmaps/CalOS.svg"
+HOME_URL/SUPPORT_URL/BUG_REPORT_URL → github.com/callenflynn/CalOS
 ```
-Overrides the base image's os-release (which build.sh removes first). Note `VERSION_ID=41`
-is hardcoded — goes stale as Fedora rolls. The repository URLs use the actual
-owner, `callenflynn` (Callen Flynn).
+`ID`/`ID_LIKE` stay `fedora` (bootc-image-builder requires it). `VERSION_ID`
+is **restored from the base image at build time** — `build.sh` captures it
+before the `system_files/` overlay and re-applies it after, so the committed
+value is a placeholder that never goes stale. Rolling builds keep the generic
+`VERSION`/`PRETTY_NAME`; versioned tag builds stamp `VERSION="1.2 (Superior)"`
+and `PRETTY_NAME="CalOS Superior"`. The repository URLs use the actual owner,
+`callenflynn` (Callen Flynn).
 
 ### GRUB (`etc/default/grub`)
 `GRUB_DISTRIBUTOR="CalOS"`, highlight color `#FF3B00/black`, `rhgb quiet` cmdline,
@@ -33,26 +38,36 @@ owner, `callenflynn` (Callen Flynn).
 
 ### Boot splash (`usr/share/plymouth/themes/calos/`)
 - `calos.plymouth` — theme manifest (script module, ImageDir + ScriptFile).
-- `calos.script` — dark `#050505` background, three fading `#FF3B00` spinner dots,
-  "CalOS" title that switches to "Shutting down..." / "Restarting..." by mode.
+- `calos.script` — dark `#050505` background, a "CalOS" title that switches to
+  "Shutting down..." / "Restarting..." by mode, three `#FF3B00` pulsing dots
+  (`●` glyphs via `Image.Text`), and the boot status message via
+  `Plymouth.SetDisplayMessageFunction`. Uses only real Plymouth script APIs
+  (`Image.Text`, `Sprite`, `Window`, `Plymouth`) — no image assets needed.
 - Activated by `plymouth-set-default-theme calos` in build.sh (with a
   `plymouthd.conf` fallback).
 
 ### GDM login screen (`usr/share/pixmaps/CalOS.svg`)
-Set as `org.gnome.login-screen` logo via the gschema override; `dconf update`
-compiles it at build time.
+Set as `org.gnome.login-screen` logo via the `gdm.d` dconf keyfile, with the
+`night-iceberg.png` wallpaper on the greeter; `dconf update` compiles it at
+build time.
 
-### Desktop defaults (`usr/share/glib-2.0/schemas/90_calos.gschema.override`)
+### Desktop defaults (`usr/share/glib-2.0/schemas/zz_calos.gschema.override`)
 - **Wallpapers:** `mountains.png` (light) / `night-iceberg.png` (dark); screensaver
   also `mountains.png`.
 - **Dock favorites:** Files, Brave, Zed, Ghostty, Software, Settings.
 - **Default terminal:** `ghostty`.
 
+The `zz_` prefix sorts after Bluefin's `zz1-bluefin-extensions.gschema.override`,
+so CalOS values win when both sets apply.
+
 ### Shell prompt (`etc/skel/.config/starship.toml`)
 CalOS-themed segmented prompt: `calos` OS chip, username, truncated git-aware
 directory, git branch/status, command duration; accent `#FF3B00`, success symbol
 `❯` in accent, error in red. Enabled for new users via `/etc/profile.d/calos.sh`
-(bash only — see INDEX gotcha #9).
+(bash only — see INDEX gotcha #9). The same profile script installs the
+`calos-update` / `calos-rollback` / `calos-version` / `calos-switch-latest`
+aliases. System updates use Universal Blue's `ujust update` (inherited from
+Bluefin), so no custom Justfile is shipped.
 
 ### Terminal info tools
 - `usr/share/fastfetch/calos-logo.txt` — the ASCII CalOS logo (source of truth).

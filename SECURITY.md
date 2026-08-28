@@ -2,10 +2,14 @@
 
 ## Supported Versions
 
+The rolling `latest` images receive continuous updates and are always
+supported. Versioned releases are supported for the current minor line.
+
 | Version | Supported          |
 | ------- | ------------------ |
-| v1.1 Huron  | :white_check_mark: |
-| v1.0 beta  | :x:                |
+| Rolling `latest` | :white_check_mark: |
+| v1.1 (Huron)  | :white_check_mark: |
+| v1.0 (beta)  | :x:                |
 
 ## Reporting a Vulnerability
 

@@ -4,15 +4,24 @@
 A custom Fedora Atomic desktop built on a Fedora Atomic base image.
 
 > [!WARNING]
-> This is a side project and may stop recieving updates at any time.
+> This is a side project and may stop receiving updates at any time.
 
 ## Variants
 
-| Tag | Base Image | GPU |
-|-----|-----------|-----|
-| `:latest` | Fedora Atomic base | AMD / Intel |
-| `:latest-nvidia` | Fedora Atomic base with NVIDIA drivers | NVIDIA (open drivers) |
-| `:vX.Y.Z` / `:vX.Y.Z-nvidia` | released on each `v*` tag | matching variant |
+| Tag | Architecture | Base Image | GPU |
+|-----|--------------|-----------|-----|
+| `:latest` | x86_64 | Fedora Atomic base | AMD / Intel |
+| `:latest-arm64` | ARM64 | Bluefin LTS (CentOS Stream 10) | AMD / Intel |
+| `:latest-nvidia` | x86_64 | Fedora Atomic base with NVIDIA drivers | NVIDIA (open drivers) |
+| `:vX.Y.Z` / `:vX.Y.Z-arm64` / `:vX.Y.Z-nvidia` | released on each `v*` tag | matching variant |
+
+> [!NOTE]
+> NVIDIA builds are **x86_64 only** — there is no ARM64 NVIDIA base image.
+> The ARM64 variant tracks the Bluefin LTS arm64 branch, which is based on
+> **CentOS Stream 10** (Bluefin publishes no Fedora-based ARM64 image);
+> x86_64 tracks Fedora. On ARM64, Ghostty is not available (no package or
+> official Linux binary for CentOS Stream), so the base terminal is used
+> instead — everything else is the same.
 
 
 # Minimum Requirements
@@ -69,12 +78,13 @@ Each release tag (e.g. `v1.2.0`) is published to its own SourceForge folder (`/1
 From any bootc-based system (Bazzite, Aurora, Fedora Atomic, or another bootc image):
 
 ```bash
+# Standard / AMD / Intel (x86_64)
 sudo bootc switch ghcr.io/callenflynn/calos:latest
-```
 
-For NVIDIA GPUs:
+# ARM64 (Apple Silicon, Raspberry Pi-style boards)
+sudo bootc switch ghcr.io/callenflynn/calos:latest-arm64
 
-```bash
+# NVIDIA GPUs (x86_64 only)
 sudo bootc switch ghcr.io/callenflynn/calos:latest-nvidia
 ```
 
@@ -85,26 +95,51 @@ sudo bootc update
 sudo reboot
 ```
 
-To pin a specific release instead of the rolling `latest` (replace v1.1.3 with the version you want to use):
+To pin a specific release instead of the rolling `latest` (replace v1.1.4 with the version you want to use):
 
 ```bash
-# Standard / AMD / Intel 
-sudo bootc switch ghcr.io/callenflynn/calos:v1.1.1
+# Standard / AMD / Intel (x86_64)
+sudo bootc switch ghcr.io/callenflynn/calos:v1.1.4
 
-# NVIDIA hardware
-sudo bootc switch ghcr.io/callenflynn/calos:v1.1.1-nvidia
+# ARM64
+sudo bootc switch ghcr.io/callenflynn/calos:v1.1.4-arm64
+
+# NVIDIA hardware (x86_64)
+sudo bootc switch ghcr.io/callenflynn/calos:v1.1.4-nvidia
 ```
 
 Reboot to apply. For the rolling channel, `bootc update` checks the selected CalOS `:latest` image and stages updates for the next reboot. Versioned tags such as `:v1.1.1` are pinned and do not move automatically.
 
 ## Disk images
 
-Prebuilt qcow2 + vmdk (VMs) and anaconda-iso (USB/installer) images are built daily and published automatically to the [SourceForge project files](https://sourceforge.net/projects/calos-linux/):
+Prebuilt qcow2 + vmdk (VMs) and anaconda-iso (USB/installer) images are built daily for both **x86_64** and **ARM64** and published automatically to the [SourceForge project files](https://sourceforge.net/projects/calos-linux/):
 
-- **standard** — AMD / Intel physical hardware (qcow2 for QEMU/Boxes, standard vmdk for VMware, installer ISO)
-- **nvidia** — NVIDIA physical hardware (qcow2, installer ISO); there is no NVIDIA VMDK because VMware virtualizes the GPU
+- **standard x86_64** — AMD / Intel physical hardware (qcow2 for QEMU/Boxes, vmdk for VMware, installer ISO)
+- **standard ARM64** — same set (Apple Silicon, Raspberry Pi-style boards)
+- **nvidia x86_64** — NVIDIA physical hardware (qcow2, installer ISO); there is no NVIDIA VMDK because VMware virtualizes the GPU, and no ARM64 NVIDIA build
 
-Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/callenflynn/calos/releases). Use the latest GitHub Release to identify the current version; the actual files are linked from that release into its matching SourceForge folder (for example `/1.1.3/`). SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page.
+Files are named `calos-<version>_<arch>[<variant>].<ext>` — for example `calos-v1.1.4_x86_64.qcow2`, `calos-v1.1.4_arm64.iso`, `calos-v1.1.4_x86_64-nvidia.iso`. On the rolling channel the version token is `latest` (`calos-latest_x86_64.qcow2`); on tagged releases it is the tag (`calos-v1.1.4_x86_64.qcow2`).
+
+Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/callenflynn/calos/releases). Use the latest GitHub Release to identify the current version; the actual files are linked from that release into its matching SourceForge folder (for example `/1.1.4/`). SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page.
+
+## Updating
+
+CalOS inherits Universal Blue's [ujust](https://docs.projectbluefin.io/administration/) command system, so updating is one command from any terminal:
+
+```bash
+ujust update    # update the system image, flatpaks, and containers, then reboot
+```
+
+`ujust` also provides `ujust rollback`, `ujust toggle-updates`, and many other recipes — run `ujust` with no arguments to list them all.
+
+There are also plain aliases if you prefer to skip `ujust`:
+
+```bash
+calos-update        # sudo bootc update && sudo reboot
+calos-rollback      # sudo bootc rollback && sudo reboot
+calos-version       # sudo bootc status
+calos-switch-latest # sudo bootc switch ghcr.io/callenflynn/calos:latest && sudo reboot
+```
 
 ## What's Included
 

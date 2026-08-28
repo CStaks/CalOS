@@ -48,33 +48,65 @@ RUN bootc container lint                          # verify image validity
 
 Runs as root inside the base image. Order matters; summarized:
 
-1. **Strip inherited vendor branding + VSCode first** (while Fedora `os-release` intact —
-   dnf5 needs correct `VERSION_ID`):
-   `dnf5 remove bluefin-logos bluefin-release bluefin-gtk-theme code`
+0. **Distro detection** — x86_64 bases are Fedora (`bluefin:stable`); the
+   ARM64 base is **CentOS Stream 10** (`bluefin:lts-testing-arm64`, Bluefin's
+   only ARM64 images are LTS/CS10). Fedora uses `dnf5`; CentOS Stream uses
+   `dnf4` + bootstraps `dnf-plugins-core` and **EPEL 10** (neovim, ripgrep,
+   fd-find, fastfetch, just all come from EPEL there).
+1. **Strip inherited vendor branding + VSCode first** (while base `os-release`
+   intact — dnf needs correct `VERSION_ID`):
+   `remove bluefin-logos bluefin-release bluefin-gtk-theme code`.
 2. **Starship** — direct GitHub-release tarball → `/usr/bin/starship`
-   (not in Fedora repos).
-3. **Zed** (replaces VSCode) — tarball from zed.dev; copies binary to
-   `/usr/bin/zed`, `.desktop` file to `/usr/share/applications`, icons to
-   `/usr/share/icons/hicolor`; avoids the broken `/root` dir issue.
-4. **Brave** (replaces Firefox) — imports Brave GPG key, adds official repo,
-   installs, **disables the repo again**, removes Firefox.
-5. **Ghostty** (replaces GNOME Terminal) — enables `scottames/ghostty` COPR,
-   installs, disables COPR (so it doesn't linger enabled).
-6. **Neovim + ripgrep + fd-find** via dnf5; clones
-   `LazyVim/starter` into `/etc/skel/.config/nvim` (strips `.git`) so every new
-   user gets LazyVim preloaded.
-7. **Overlay branding:** `cp -avf /ctx/system_files/. /` then
-   `glib-compile-schemas` (activates `90_calos.gschema.override`). On
-   versioned builds (when the `CALOS_VERSION` / `CALOS_CODENAME` build args are
-   set, e.g. from a `v1.2.0` tag) `build.sh` then overrides only `VERSION` and
-   `PRETTY_NAME` in `/usr/lib/os-release` — `VERSION="1.2 (Superior)"`,
-   `PRETTY_NAME="CalOS Superior"` — leaving `VERSION_ID` as Fedora's so
-   bootc-image-builder keeps accepting the file. Rolling builds leave the
-   committed os-release untouched.
-8. **Plymouth:** `plymouth-set-default-theme calos`, with a
-   `/etc/plymouth/plymouthd.conf` fallback.
-9. **Starship init** for bash via `/etc/profile.d/calos.sh`.
-10. `dconf update` (GDM login logo) and `systemctl enable podman.socket`.
+   (not in distro repos). **Arch-aware**: x86_64 uses the gnu build,
+   aarch64 uses the **musl** build (`starship-aarch64-unknown-linux-musl` —
+   Starship doesn't publish an aarch64 gnu asset; the musl binary is static
+   and runs fine on glibc).
+3. **Zed** (replaces VSCode) — tarball from zed.dev (`zed-linux-aarch64.tar.gz`
+   on ARM64); copies binary to `/usr/bin/zed`, `.desktop` file to
+   `/usr/share/applications`, icons to `/usr/share/icons/hicolor`; avoids the
+   broken `/root` dir issue.
+4. **Brave** (replaces Firefox) — imports Brave GPG key, adds the official
+   repo (distro-agnostic `$basearch` URL; `--add-repo` on dnf4 vs
+   `addrepo --from-repofile` on dnf5), installs, **disables the repo again**,
+   removes Firefox.
+5. **Ghostty** (replaces GNOME Terminal) — **Fedora only**: enables the
+   `scottames/ghostty` COPR, installs, disables the COPR. CentOS Stream has
+   no ghostty package, COPR build, or official Linux binary, so it is
+   skipped there and the ghostty dconf/gsettings defaults are stripped after
+   the overlay (base terminal kept).
+6. **Zoxide + lazygit** — on Fedora via dnf/COPR; on CentOS Stream from
+   official GitHub release binaries (arch-aware, resolved via the GitHub API
+   `browser_download_url`). **tmux + gcc/gcc-c++/make/unzip** (dev tools)
+   from distro repos on both.
+7. **Neovim + ripgrep + fd-find + fastfetch** (EPEL 10 on CentOS Stream);
+   clones `LazyVim/starter` into `/etc/skel/.config/nvim` (strips `.git`) so
+   every new user gets LazyVim preloaded.
+8. **User command set:** ensures `just` is present (ujust, inherited from
+   Bluefin, needs it) and writes `/etc/profile.d/calos.sh` (starship/zoxide
+   init and `calos-update`/`calos-rollback`/`calos-version`/
+   `calos-switch-latest` aliases). Sourced from `/etc/bashrc` too so GUI
+   terminals get it. System updates are `ujust update` (Universal Blue's
+   command system) — no custom end-user Justfile is shipped.
+9. **Overlay branding:** captures the base image's `ID` / `ID_LIKE` /
+   `VERSION_ID` from `/usr/lib/os-release` **before**
+   `cp -avf /ctx/system_files/. /`, then restores them after the overlay —
+   so the committed os-release's placeholder identity never goes stale and
+   bootc-image-builder keeps accepting the file (Fedora 43 on x86_64,
+   CentOS Stream 10 on ARM64). If Ghostty was skipped, the ghostty entries in
+   `site.d/01-calos` and `zz_calos.gschema.override` are stripped here. Then
+   `glib-compile-schemas` (activates `zz_calos.gschema.override`, which sorts
+   after Bluefin's `zz1-*` so CalOS wins). On versioned builds (when the
+   `CALOS_VERSION` / `CALOS_CODENAME` build args are set, e.g. from a
+   `v1.2.0` tag) it then overrides only `VERSION` and `PRETTY_NAME` in
+   `/usr/lib/os-release` — `VERSION="1.2 (Superior)"`,
+   `PRETTY_NAME="CalOS Superior"` — leaving `ID`/`ID_LIKE`/`VERSION_ID` as
+   the base's. Rolling builds keep the generic committed values.
+10. **Plymouth:** `plymouth-set-default-theme calos`, with a
+    `/etc/plymouth/plymouthd.conf` fallback.
+11. **dconf:** ensures the `gdm` and `site` system databases are wired into
+    `/etc/dconf/profile/gdm` and `/etc/dconf/profile/user`, then `dconf update`
+    (compiles GDM login logo + wallpaper, dock, terminal defaults).
+12. `systemctl enable podman.socket`.
 
 ## 4. `Justfile` — local development
 
@@ -101,6 +133,10 @@ locally. Public recipes:
 Private helpers: `sudoif` (root-or-sudo wrapper), `_rootful_load_image`
 (rootful podman image transfer), `_build-bib` / `_rebuild-bib` (BIB plumbing),
 `_run-vm`.
+
+> **Note:** this repo-root Justfile is the *developer* task file only — it is
+> never baked into the image. End users update via Universal Blue's `ujust
+> update` (inherited from Bluefin), so no end-user Justfile is shipped.
 
 **Local dev loop:** `just build` → (optional `just ostree-rechunk`) →
 `just build-qcow2` → `just run-vm-qcow2`. Disk images land in `output/`.

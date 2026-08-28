@@ -1,55 +1,77 @@
 // CalOS Plymouth Boot Theme
 // Dark background (#050505), accent spinner (#FF3B00), light text (#E0E0E0)
+//
+// Uses only real Plymouth script APIs:
+//   Window.SetBackgroundTopColor/BottomColor, Window.GetWidth/GetHeight
+//   Image.Text(text, r, g, b, alpha, font, align)   (font NULL = Pango default)
+//   Sprite.New / SetImage / SetX / SetY / SetZ / SetOpacity / GetWidth / GetHeight
+//   Plymouth.SetDisplayMessageFunction(fun(message)), SetRefreshFunction, GetMode
 
-Window.SetBackgroundTopColor(0.0196, 0.0196, 0.0196);  // #050505
+Window.SetBackgroundTopColor(0.0196, 0.0196, 0.0196);    // #050505
 Window.SetBackgroundBottomColor(0.0196, 0.0196, 0.0196); // #050505
 
-logo = Image.New();
-// No image logo - clean text-based boot
+// Title ("CalOS" while booting, mode text otherwise)
+title_sprite = Sprite.New();
+title_sprite.SetZ(10);
 
-title = Sprite.New();
-title.SetX(Window.GetWidth() / 2 - 200);
-title.SetY(Window.GetHeight() / 2 - 60);
-title.SetZ(10);
+// Boot status message (fed in by Plymouth.SetDisplayMessageFunction)
+message_sprite = Sprite.New();
+message_sprite.SetZ(10);
 
-message = Sprite.New();
-message.SetX(Window.GetWidth() / 2 - 200);
-message.SetY(Window.GetHeight() / 2 + 10);
-message.SetZ(10);
+// Spinner: three accent dots ("●" renders via the Pango label plugin)
+dot1 = Sprite.New();
+dot2 = Sprite.New();
+dot3 = Sprite.New();
+dot1.SetZ(20);
+dot2.SetZ(20);
+dot3.SetZ(20);
 
-// Spinner dots
-spinner_dot1 = Rectangle.New();
-spinner_dot1.SetSize(8, 8);
-spinner_dot1.SetX(Window.GetWidth() / 2 - 20);
-spinner_dot1.SetY(Window.GetHeight() / 2 + 60);
-spinner_dot1.SetZ(10);
-spinner_dot1.SetColor(1.0, 0.231, 0.0, 1.0); // #FF3B00
+dot1.SetImage(Image.Text("●", 1.0, 0.231, 0.0, 1.0, NULL, "center"));
+dot2.SetImage(Image.Text("●", 1.0, 0.231, 0.0, 1.0, NULL, "center"));
+dot3.SetImage(Image.Text("●", 1.0, 0.231, 0.0, 1.0, NULL, "center"));
 
-spinner_dot2 = Rectangle.New();
-spinner_dot2.SetSize(8, 8);
-spinner_dot2.SetX(Window.GetWidth() / 2);
-spinner_dot2.SetY(Window.GetHeight() / 2 + 60);
-spinner_dot2.SetZ(10);
-spinner_dot2.SetColor(1.0, 0.231, 0.0, 0.6); // #FF3B00 faded
+phase = 0;
 
-spinner_dot3 = Rectangle.New();
-spinner_dot3.SetSize(8, 8);
-spinner_dot3.SetX(Window.GetWidth() / 2 + 20);
-spinner_dot3.SetY(Window.GetHeight() / 2 + 60);
-spinner_dot3.SetZ(10);
-spinner_dot3.SetColor(1.0, 0.231, 0.0, 0.3); // #FF3B00 more faded
+Plymouth.SetDisplayMessageFunction(fun (message)
+    message_sprite.SetImage(Image.Text(message, 0.878, 0.878, 0.878, 1.0, NULL, "center"));
+    message_sprite.SetX(Window.GetWidth() / 2 - message_sprite.GetWidth() / 2);
+    message_sprite.SetY(Window.GetHeight() / 2 + 70);
+end)
 
-title_text = "CalOS";
-title.SetText(title_text);
+Plymouth.SetRefreshFunction(fun ()
+    mode = Plymouth.GetMode();
 
-Plymouth.SetRefreshFunction (function ()
-    if (Plymouth.GetMode() == "boot")
-        title.SetText(title_text);
-    else if (Plymouth.GetMode() == "shutdown")
-        title.SetText("Shutting down...");
-    else if (Plymouth.GetMode() == "restart")
-        title.SetText("Restarting...");
+    if (mode == "boot")
+        title_sprite.SetImage(Image.Text("CalOS", 1.0, 0.231, 0.0, 1.0, NULL, "center"));
+    else if (mode == "shutdown")
+        title_sprite.SetImage(Image.Text("Shutting down...", 0.878, 0.878, 0.878, 1.0, NULL, "center"));
+    else if (mode == "restart")
+        title_sprite.SetImage(Image.Text("Restarting...", 0.878, 0.878, 0.878, 1.0, NULL, "center"));
     end
 
-    message.SetText(Plymouth.GetDisplayMessage());
+    title_sprite.SetX(Window.GetWidth() / 2 - title_sprite.GetWidth() / 2);
+    title_sprite.SetY(Window.GetHeight() / 2 - 50);
+
+    // Rotating pulse: one dot bright, the others faded, advancing each refresh.
+    phase = phase + 1;
+    if (phase % 3 == 0)
+        dot1.SetOpacity(1.0);
+        dot2.SetOpacity(0.35);
+        dot3.SetOpacity(0.1);
+    else if (phase % 3 == 1)
+        dot1.SetOpacity(0.35);
+        dot2.SetOpacity(1.0);
+        dot3.SetOpacity(0.35);
+    else
+        dot1.SetOpacity(0.1);
+        dot2.SetOpacity(0.35);
+        dot3.SetOpacity(1.0);
+    end
+
+    dot1.SetX(Window.GetWidth() / 2 - 30 - dot1.GetWidth() / 2);
+    dot2.SetX(Window.GetWidth() / 2 - dot2.GetWidth() / 2);
+    dot3.SetX(Window.GetWidth() / 2 + 30 - dot3.GetWidth() / 2);
+    dot1.SetY(Window.GetHeight() / 2 + 20);
+    dot2.SetY(Window.GetHeight() / 2 + 20);
+    dot3.SetY(Window.GetHeight() / 2 + 20);
 end)
