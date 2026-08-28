@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: CalOS Discussions
+    url: https://github.com/callenflynn/CalOS/discussions
+    about: Ask questions, share ideas, and discuss CalOS with the community.
+  - name: Security vulnerability
+    url: https://github.com/callenflynn/CalOS/blob/main/SECURITY.md
+    about: Please follow the private reporting instructions for security issues.
