@@ -28,7 +28,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@v2.0.0
+        uses: ludeeus/action-shellcheck@v2
 
   zizmor:
     name: Lint Workflows
