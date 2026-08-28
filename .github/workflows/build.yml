@@ -11,6 +11,16 @@ on:
       - main
     paths-ignore:
       - '**/README.md'
+      - '**/SUPPORT.md'
+      - '**/LICENSE'
+      - '**/CONTRIBUTING.md'
+      - '**/CODE_OF_CONDUCT.md'
+      - '**/SECURITY.md'
+      - '/docs/**'
+      - '/CalOS/**'
+      - '/.github/ISSUE_TEMPLATE/**'
+      - '/freebuff/**'
+      - '/Justfile'
   workflow_dispatch:
 
 permissions:

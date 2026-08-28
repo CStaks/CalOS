@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const askGraphics = () => {
         renderQuestion(`Question 2 of ${totalSteps()}`, 'What graphics card do you have?', [
             { text: 'AMD or Intel', detail: 'Use the Standard build', attributes: { graphics: 'standard' } },
-            { text: 'NVIDIA', detail: 'Use the NVIDIA build (x86_64 only)', attributes: { graphics: 'nvidia' } },
+            { text: 'NVIDIA', detail: 'Use the NVIDIA build', attributes: { graphics: 'nvidia' } },
         ]);
     };
 
