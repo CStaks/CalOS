@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const recommendationLink = document.getElementById('recommendation-link');
 
     const state = { graphics: '', arch: '', install: '', vm: '' };
+    let shouldScrollToChooser = false;
 
     const show = (el) => el?.classList.remove('is-hidden');
     const hide = (el) => el?.classList.add('is-hidden');
@@ -35,7 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
         show(questionPanel);
         hide(recommendation);
-        questionPanel?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (shouldScrollToChooser) {
+            questionPanel?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            shouldScrollToChooser = false;
+        }
     };
 
     const askGraphics = () => {
@@ -119,18 +123,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const button = event.target.closest('button');
         if (!button) return;
         if (button.dataset.graphics) {
+            shouldScrollToChooser = true;
             state.graphics = button.dataset.graphics;
             state.arch = state.install = state.vm = '';
             if (state.graphics === 'nvidia') askInstall();
             else askArch();
         } else if (button.dataset.arch) {
+            shouldScrollToChooser = true;
             state.arch = button.dataset.arch;
             askInstall();
         } else if (button.dataset.install) {
+            shouldScrollToChooser = true;
             state.install = button.dataset.install;
             if (state.install === 'vm') askVm();
             else recommend();
         } else if (button.dataset.vm) {
+            shouldScrollToChooser = true;
             state.vm = button.dataset.vm;
             recommend();
         }
@@ -138,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     chooserReset?.addEventListener('click', () => {
         state.graphics = state.arch = state.install = state.vm = '';
+        shouldScrollToChooser = true;
         askGraphics();
     });
 
@@ -154,8 +163,16 @@ document.addEventListener('DOMContentLoaded', () => {
         hide(questionPanel);
         show(recommendation);
         recommendationLink?.focus();
-        recommendation.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (shouldScrollToChooser) {
+            recommendation.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            shouldScrollToChooser = false;
+        }
     }
+
+    downloadBtn?.addEventListener('click', () => {
+        shouldScrollToChooser = true;
+        document.getElementById('chooser')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 
     // Render the first question on load (also keeps the step label accurate
     // for the NVIDIA path, which has one fewer question).
