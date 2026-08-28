@@ -1,0 +1,35 @@
+language: en-US
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  high_level_summary_in_walkthrough: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  path_filters:
+    - "!freebuff/**"
+    - "!CalOS/**"
+    - "!docs/*.png"
+    - "!docs/*.webp"
+    - "!docs/*.jpg"
+    - "!docs/*.ico"
+    - "!*.lock"
+  path_instructions:
+    - path: "build_files/**"
+      instructions: "Review shell safety, architecture handling, package installation, error handling, and reproducibility for immutable bootc images."
+    - path: ".github/workflows/**"
+      instructions: "Review permissions, action pinning, shell quoting, secret handling, and release safety."
+    - path: "docs/**"
+      instructions: "Review browser behavior, accessibility, link correctness, and compatibility with GitHub Pages."
+    - path: "Containerfile"
+      instructions: "Review bootc/container layering, portability across x86_64 and arm64, and least-privilege concerns."
+chat:
+  auto_reply: true
+  integrations:
+    - github
+knowledge_base:
+  opt_out: false
+code_generation:
+  docstrings:
+    language: "off"
