@@ -16,12 +16,7 @@ A custom Fedora Atomic desktop built on a Fedora Atomic base image.
 | `:vX.Y.Z` / `:vX.Y.Z-arm64` / `:vX.Y.Z-nvidia` | released on each `v*` tag | matching variant |
 
 > [!NOTE]
-> NVIDIA builds are **x86_64 only** — there is no ARM64 NVIDIA base image.
-> The ARM64 variant tracks the Bluefin LTS arm64 branch, which is based on
-> **CentOS Stream 10** (Bluefin publishes no Fedora-based ARM64 image);
-> x86_64 tracks Fedora. On ARM64, Ghostty is not available (no package or
-> official Linux binary for CentOS Stream), so the base terminal is used
-> instead — everything else is the same.
+> ARM64 releases are supported, but the underlying base image has **limited ARM64 support**. As a result, a small number of components may differ from the AMD64 build. The AMD64 release uses the full feature set of the base image, while the ARM64 release uses the closest available alternatives where ARM64 support is unavailable.
 
 
 # Minimum Requirements
