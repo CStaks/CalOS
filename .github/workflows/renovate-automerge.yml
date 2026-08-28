@@ -15,3 +15,17 @@ jobs:
     uses: projectbluefin/actions/.github/workflows/reusable-renovate-automerge.yml@v1
     with:
       head_sha: ${{ github.event.workflow_run.head_sha }}
+
+  notify:
+    name: Notify Discord
+    needs: automerge
+    if: ${{ always() }}
+    uses: ./.github/workflows/notify-discord.yml
+    with:
+      workflow_name: ${{ github.workflow }}
+      status: ${{ needs.automerge.result }}
+      run_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      ref_name: ${{ github.ref_name }}
+      sha: ${{ github.event.workflow_run.head_sha }}
+      event_name: ${{ github.event_name }}
+    secrets: inherit

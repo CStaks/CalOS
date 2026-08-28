@@ -173,3 +173,17 @@ jobs:
           # use old bundle format, so we can use newer cosign 3.X.X instead of 2.X.X
           cosign sign -y --new-bundle-format=false --use-signing-config=false --key env://COSIGN_PRIVATE_KEY ${IMAGE_REGISTRY}/${IMAGE_NAME}@${DIGEST}
 
+  notify:
+    name: Notify Discord
+    needs: build_push
+    if: ${{ always() }}
+    uses: ./.github/workflows/notify-discord.yml
+    with:
+      workflow_name: ${{ github.workflow }}
+      status: ${{ needs.build_push.result }}
+      run_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      ref_name: ${{ github.ref_name }}
+      sha: ${{ github.sha }}
+      event_name: ${{ github.event_name }}
+    secrets: inherit
+

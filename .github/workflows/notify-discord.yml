@@ -1,0 +1,73 @@
+name: Notify Discord
+
+on:
+  workflow_call:
+    inputs:
+      workflow_name:
+        required: true
+        type: string
+      status:
+        required: true
+        type: string
+      run_url:
+        required: true
+        type: string
+      ref_name:
+        required: true
+        type: string
+      sha:
+        required: true
+        type: string
+      event_name:
+        required: true
+        type: string
+    secrets:
+      DISCORD_WEBHOOK_1:
+        required: false
+
+jobs:
+  notify:
+    name: Send Discord notification
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Send completion notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_1 }}
+          WORKFLOW_NAME: ${{ inputs.workflow_name }}
+          WORKFLOW_STATUS: ${{ inputs.status }}
+          RUN_URL: ${{ inputs.run_url }}
+          REPOSITORY: ${{ github.repository }}
+          REF_NAME: ${{ inputs.ref_name }}
+          SHA: ${{ inputs.sha }}
+          EVENT_NAME: ${{ inputs.event_name }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$DISCORD_WEBHOOK" ]]; then
+            echo "DISCORD_WEBHOOK_1 secret is not set — skipping notification"
+            exit 0
+          fi
+          python3 - <<'PY' > /tmp/discord-payload.json
+          import json
+          import os
+          status = os.environ["WORKFLOW_STATUS"]
+          color = {"success": 3066993, "failure": 15158332, "cancelled": 9807270}.get(status, 9807270)
+          ref = os.environ["REF_NAME"] or os.environ["SHA"][:12]
+          repository = os.environ["REPOSITORY"]
+          sha = os.environ["SHA"]
+          print(json.dumps({"embeds": [{
+              "title": f"{os.environ['WORKFLOW_NAME']} — {status}",
+              "url": os.environ["RUN_URL"],
+              "description": f"[{repository}]({os.environ['RUN_URL']}) finished with **{status}**.",
+              "color": color,
+              "fields": [
+                  {"name": "Git ref", "value": f"`{ref}`", "inline": True},
+                  {"name": "Commit", "value": f"[`{sha[:12]}`](https://github.com/{repository}/commit/{sha})", "inline": True},
+                  {"name": "Event", "value": f"`{os.environ['EVENT_NAME']}`", "inline": True},
+              ],
+              "footer": {"text": "CalOS GitHub Actions"},
+          }]}))
+          PY
+          curl --fail-with-body --silent --show-error \
+            -H 'Content-Type: application/json' \
+            --data @/tmp/discord-payload.json \
+            "$DISCORD_WEBHOOK"

@@ -388,3 +388,17 @@ jobs:
               -e "ssh $SSH_OPTS" \
               dist/ "$SF_BASE/"
           fi
+
+  notify:
+    name: Notify Discord
+    needs: [build-versioned-images, build, release]
+    if: ${{ always() }}
+    uses: ./.github/workflows/notify-discord.yml
+    with:
+      workflow_name: ${{ github.workflow }}
+      status: ${{ needs.release.result }}
+      run_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      ref_name: ${{ github.ref_name }}
+      sha: ${{ github.sha }}
+      event_name: ${{ github.event_name }}
+    secrets: inherit
