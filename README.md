@@ -166,6 +166,10 @@ calos-switch-latest # sudo bootc switch ghcr.io/callenflynn/calos:latest && sudo
 - **gcc, gcc-c++, make** — Build toolchain
 - **unzip** — Archive extraction
 
+# Support
+
+Need help or have questions? See [SUPPORT.md](SUPPORT.md) for where to ask questions, report bugs, and request features.
+
 # Screenshots
 
 v1.1.0 desktop

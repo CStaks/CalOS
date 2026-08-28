@@ -33,8 +33,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
 
-      # This repository has no compiled application; JavaScript is analyzed
-      # directly and Actions workflows are analyzed directly as YAML.
+      # CalOS has no compiled application; analyze JavaScript and Actions directly.
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:

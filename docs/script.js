@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const githubBtn = document.getElementById('btn-github');
+    const wikiBtn = document.getElementById('btn-wiki');
     const downloadBtn = document.getElementById('btn-download');
     const questionPanel = document.getElementById('question-panel');
     const stepLabel = document.getElementById('step-label');
@@ -160,6 +161,34 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'https://github.com/callenflynn/CalOS';
     });
 
+    wikiBtn?.addEventListener('click', () => {
+        window.location.href = 'wiki/';
+    });
+
     // Initialize without scrolling so URLs such as /#about remain at their target.
     askArch();
+});
+
+// Populate the GitHub repo card live from the GitHub API.
+// The static content in the markup acts as a fallback if the request fails.
+(async function loadGithubCard() {
+    const card = document.getElementById('github-card');
+    if (!card) return;
+    try {
+        const res = await fetch('https://api.github.com/repos/callenflynn/CalOS');
+        if (!res.ok) throw new Error(`GitHub API responded ${res.status}`);
+        const data = await res.json();
+        card.querySelectorAll('[data-field]').forEach((el) => {
+            const value = data[el.dataset.field];
+            if (value != null) el.textContent = value;
+        });
+    } catch (err) {
+        // Keep the static fallback content as-is.
+    }
+})();
+
+// Auto-update the copyright year in the footer.
+document.addEventListener('DOMContentLoaded', () => {
+    const yearEl = document.getElementById('year');
+    if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 });

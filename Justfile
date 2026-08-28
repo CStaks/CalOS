@@ -101,26 +101,36 @@ build $target_image=image_name $tag=default_tag $extra_args="":
 
     BUILD_ARGS=()
     LABELS=()
+    # Only add a label when its value is non-empty. Without this, an empty CI
+    # value (e.g. when image-template.env isn't loaded) would pass `--label
+    # key=` and override the authoritative LABELs baked into the Containerfile,
+    # surfacing the base image's branding (Bluefin / ublue-os) on Artifact Hub.
+    add_label() {
+        local key="$1" value="$2"
+        if [[ -n "$value" ]]; then
+            LABELS+=("--label" "${key}=${value}")
+        fi
+    }
     if [[ -z "$(git status -s)" ]]; then
         GIT_SHA=$(git rev-parse --short HEAD)
-        LABELS+=("--label" "io.artifacthub.package.readme-url=https://raw.githubusercontent.com/{{ repo_organization }}/{{ image_name }}/${GIT_SHA}/README.md")
-        LABELS+=("--label" "org.opencontainers.image.documentation=https://raw.githubusercontent.com/{{ repo_organization }}/{{ image_name }}/${GIT_SHA}/README.md")
-        LABELS+=("--label" "org.opencontainers.image.source=https://github.com/{{ repo_organization }}/{{ image_name }}/blob/${GIT_SHA}/Containerfile")
-        LABELS+=("--label" "org.opencontainers.image.url=https://github.com/{{ repo_organization }}/{{ image_name }}/tree/${GIT_SHA}")
-        LABELS+=("--label" "org.opencontainers.image.version={{ default_tag }}.$(date +%Y%m%d)-${GIT_SHA}")
+        add_label "io.artifacthub.package.readme-url" "https://raw.githubusercontent.com/{{ repo_organization }}/{{ image_name }}/${GIT_SHA}/README.md"
+        add_label "org.opencontainers.image.documentation" "https://raw.githubusercontent.com/{{ repo_organization }}/{{ image_name }}/${GIT_SHA}/README.md"
+        add_label "org.opencontainers.image.source" "https://github.com/{{ repo_organization }}/{{ image_name }}/blob/${GIT_SHA}/Containerfile"
+        add_label "org.opencontainers.image.url" "https://github.com/{{ repo_organization }}/{{ image_name }}/tree/${GIT_SHA}"
+        add_label "org.opencontainers.image.version" "{{ default_tag }}.$(date +%Y%m%d)-${GIT_SHA}"
     fi
 
     # Image metadata for https://artifacthub.io/ - This is optional but is highly recommended so we all can get a index of all the custom images
     # The metadata by itself is not going to do anything, you choose if you want your image to be on ArtifactHub or not.
     LABELS+=("--label" "io.artifacthub.package.deprecated=false")
-    LABELS+=("--label" "io.artifacthub.package.keywords={{ image_keywords }}")
+    add_label "io.artifacthub.package.keywords" "{{ image_keywords }}"
     LABELS+=("--label" "io.artifacthub.package.license=Apache-2.0")
-    LABELS+=("--label" "io.artifacthub.package.logo-url={{ image_logo_url }}")
+    add_label "io.artifacthub.package.logo-url" "{{ image_logo_url }}"
     LABELS+=("--label" "io.artifacthub.package.prerelease=false")
     LABELS+=("--label" "org.opencontainers.image.created=$(date -u +%Y\-%m\-%d\T%H\:%M\:%S\Z)")
-    LABELS+=("--label" "org.opencontainers.image.description={{ image_desc }}")
-    LABELS+=("--label" "org.opencontainers.image.title={{ image_name }}")
-    LABELS+=("--label" "org.opencontainers.image.vendor={{ repo_organization }}")
+    add_label "org.opencontainers.image.description" "{{ image_desc }}"
+    add_label "org.opencontainers.image.title" "{{ image_name }}"
+    add_label "org.opencontainers.image.vendor" "{{ repo_organization }}"
 
     # This actually builds the image!
     PODMAN_BUILD_ARGS=("${BUILD_ARGS[@]}" "${LABELS[@]}" --pull=newer --tag "${target_image}:${tag}" --file Containerfile)
