@@ -2,10 +2,34 @@
 
 set -ouex pipefail
 
+### Detect the base distro
+# x86_64 CalOS builds on `bluefin:stable` (Fedora). The only ARM64 Bluefin
+# tags are LTS builds on CentOS Stream 10, so the script must handle both.
+if grep -qE '^ID=(")?centos' /usr/lib/os-release 2>/dev/null; then
+    DISTRO="centos"
+else
+    DISTRO="fedora"
+fi
+
+### Package manager: dnf5 on Fedora, dnf4 on CentOS Stream
+if [[ "${DISTRO}" == "centos" ]]; then
+    DNF="dnf"
+    # dnf-plugins-core provides `config-manager` for dnf4; bootstrap EPEL 10
+    # (neovim, ripgrep, fd-find, fastfetch, just all come from there on CS10).
+    dnf install -y dnf-plugins-core
+    dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
+    # dnf4 doesn't understand --skip-unavailable; this setopt is its equivalent
+    SKIP_MISSING="--setopt=skip_missing_names_on_install=True"
+else
+    DNF="dnf5"
+    SKIP_MISSING="--skip-unavailable"
+fi
+
 ### Rebrand: remove inherited vendor branding packages and VSCode
-# Do removes first while Fedora os-release is still intact (dnf5 needs correct VERSION_ID)
-dnf5 remove -y bluefin-logos bluefin-release bluefin-gtk-theme 2>/dev/null || true
-dnf5 remove -y code 2>/dev/null || true
+# Do removes first while the base os-release is still intact (dnf needs
+# correct VERSION_ID).
+"${DNF}" remove -y bluefin-logos bluefin-release bluefin-gtk-theme 2>/dev/null || true
+"${DNF}" remove -y code 2>/dev/null || true
 
 ### Install packages (all done BEFORE overlaying CalOS os-release)
 
@@ -14,10 +38,10 @@ dnf5 remove -y code 2>/dev/null || true
 # List of rpmfusion packages can be found here:
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
-### Starship prompt (direct binary — not in Fedora repos)
+### Starship prompt (direct binary — not in distro repos)
 # Arch-aware: Starship publishes x86_64 as gnu but aarch64 only as musl
-# (statically linked, runs fine on Fedora's glibc). Verified against the
-# v1.26.0 release assets.
+# (statically linked, runs fine on glibc). Verified against the v1.26.0
+# release assets.
 case "$(uname -m)" in
     aarch64) STARSHIP_TRIPLE="aarch64-unknown-linux-musl" ;;
     *)       STARSHIP_TRIPLE="x86_64-unknown-linux-gnu" ;;
@@ -42,36 +66,73 @@ cp -r /tmp/zed-install/zed.app/share/icons/hicolor/* /usr/share/icons/hicolor/ 2
 rm -rf /tmp/zed.tar.gz /tmp/zed-install
 
 ### Brave Browser (replaces Firefox)
-# Import Brave's GPG key and add their official RPM repo
+# Import Brave's GPG key and add their official RPM repo (distro-agnostic:
+# baseurl is $basearch only, so it serves both Fedora and CentOS Stream).
 rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
-dnf5 config-manager addrepo --from-repofile=https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo 2>/dev/null || true
-dnf5 install -y brave-browser
+if [[ "${DISTRO}" == "centos" ]]; then
+    "${DNF}" config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo 2>/dev/null || true
+else
+    "${DNF}" config-manager addrepo --from-repofile=https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo 2>/dev/null || true
+fi
+"${DNF}" install -y brave-browser
 # Disable the Brave repo so it doesn't remain enabled on the final image
-dnf5 config-manager --disable brave-browser 2>/dev/null || true
+"${DNF}" config-manager --disable brave-browser 2>/dev/null || true
 # Remove Firefox
-dnf5 remove -y firefox 2>/dev/null || true
+"${DNF}" remove -y firefox 2>/dev/null || true
 
 ### Ghostty Terminal (replaces GNOME Terminal)
-# Enable the scottames/ghostty COPR repository (has Fedora 44+ builds)
-dnf5 -y copr enable scottames/ghostty
-dnf5 install -y ghostty
-# Disable the COPR so it doesn't remain enabled on the final image
-dnf5 -y copr disable scottames/ghostty
+# Fedora: scottames/ghostty COPR (has Fedora 44+ builds). CentOS Stream has
+# no ghostty package, COPR build, or official Linux binary, so it is skipped
+# there and the base image's default terminal is kept instead (the ghostty
+# dconf/gsettings defaults are stripped after the overlay below).
+if [[ "${DISTRO}" == "fedora" ]]; then
+    "${DNF}" -y copr enable scottames/ghostty
+    "${DNF}" install -y ghostty
+    # Disable the COPR so it doesn't remain enabled on the final image
+    "${DNF}" -y copr disable scottames/ghostty
+fi
 
 ### Zoxide (smarter cd replacement)
-dnf5 install -y zoxide --skip-unavailable
+if [[ "${DISTRO}" == "centos" ]]; then
+    # Not packaged for CentOS Stream — install the official static musl binary.
+    case "$(uname -m)" in
+        aarch64) ZOXIDE_TRIPLE="aarch64-unknown-linux-musl" ;;
+        *)       ZOXIDE_TRIPLE="x86_64-unknown-linux-musl" ;;
+    esac
+    ZOXIDE_URL=$(curl -fsSL "https://api.github.com/repos/ajeetdsouza/zoxide/releases/latest" \
+        | grep -oE '"browser_download_url": *"[^"]*'"${ZOXIDE_TRIPLE}"'[^"]*"' | head -n1 | cut -d'"' -f4)
+    curl -fsSL "${ZOXIDE_URL}" -o /tmp/zoxide.tar.gz
+    tar xzf /tmp/zoxide.tar.gz -C /usr/bin zoxide
+    rm -f /tmp/zoxide.tar.gz
+else
+    "${DNF}" install -y zoxide "${SKIP_MISSING}"
+fi
 
 ### tmux + build toolchain (developer tools)
-dnf5 install -y tmux gcc gcc-c++ make unzip --skip-unavailable
+"${DNF}" install -y tmux gcc gcc-c++ make unzip "${SKIP_MISSING}"
 
-### lazygit (Git TUI) — atim/lazygit COPR has multi-arch builds
-dnf5 -y copr enable atim/lazygit
-dnf5 install -y lazygit
-dnf5 -y copr disable atim/lazygit
+### lazygit (Git TUI)
+if [[ "${DISTRO}" == "centos" ]]; then
+    # Not packaged for CentOS Stream — install the official binary.
+    case "$(uname -m)" in
+        aarch64) LAZYGIT_ARCH="arm64" ;;
+        *)       LAZYGIT_ARCH="x86_64" ;;
+    esac
+    LAZYGIT_URL=$(curl -fsSL "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" \
+        | grep -oE '"browser_download_url": *"[^"]*linux_'"${LAZYGIT_ARCH}"'[^"]*"' | head -n1 | cut -d'"' -f4)
+    curl -fsSL "${LAZYGIT_URL}" -o /tmp/lazygit.tar.gz
+    tar xzf /tmp/lazygit.tar.gz -C /usr/bin lazygit
+    rm -f /tmp/lazygit.tar.gz
+else
+    # atim/lazygit COPR has multi-arch builds
+    "${DNF}" -y copr enable atim/lazygit
+    "${DNF}" install -y lazygit
+    "${DNF}" -y copr disable atim/lazygit
+fi
 
 ### Neovim + LazyVim (terminal IDE)
-# Install neovim and its ecosystem dependencies
-dnf5 install -y neovim ripgrep fd-find fastfetch --skip-unavailable
+# Install neovim and its ecosystem dependencies (EPEL 10 on CentOS Stream)
+"${DNF}" install -y neovim ripgrep fd-find fastfetch "${SKIP_MISSING}"
 
 # Preload LazyVim starter config for new users
 # Cloned into /etc/skel/ so every new user gets LazyVim out of the box
@@ -83,7 +144,7 @@ rm -rf "$LAZYVIM_SKEL/.git"
 ### Install the CalOS convenience command set
 # The source Justfile is a build/development task file, so ship a small
 # end-user Justfile separately instead of exposing build recipes in releases.
-dnf5 install -y just --skip-unavailable
+"${DNF}" install -y just "${SKIP_MISSING}"
 mkdir -p /usr/share/calos
 cat > /usr/share/calos/Justfile << 'CALOSJUSTEOF'
 # CalOS user commands
@@ -177,7 +238,7 @@ if [ -f /etc/bashrc ]; then
     fi
 fi
 
-### Same defaults for zsh users (Fedora ships /etc/zshrc for interactive shells)
+### Same defaults for zsh users (distros ship /etc/zshrc for interactive shells)
 if [ -f /etc/zshrc ]; then
     if ! grep -q 'calos' /etc/zshrc; then
         cat >> /etc/zshrc << 'CALOSZSHEOF'
@@ -214,20 +275,34 @@ CALOSZSHEOF
     fi
 fi
 
-### Overlay CalOS branding files (after all installs — os-release must NOT override Fedora VERSION_ID yet)
-# Capture the base image's Fedora VERSION_ID before the overlay replaces
-# os-release. bootc-image-builder requires a valid Fedora VERSION_ID, and the
-# base rolls between Fedora releases, so we restore it below instead of
-# shipping a hardcoded value that goes stale.
-BASE_VERSION_ID=$(grep '^VERSION_ID=' /usr/lib/os-release | head -n1 || true)
+### Overlay CalOS branding files (after all installs — os-release must NOT override the base yet)
+# Capture the base image's distro identity (ID / ID_LIKE / VERSION_ID) before
+# the overlay replaces os-release. bootc-image-builder validates these, and
+# the bases roll between releases (Fedora 43 on x86_64, CentOS Stream 10 on
+# ARM64), so we restore them below instead of shipping hardcoded values that
+# go stale.
+BASE_OS_RELEASE=$(grep -E '^(ID|ID_LIKE|VERSION_ID)=' /usr/lib/os-release || true)
 
 # Copy the contents of system_files/ of the git repo to /
 cp -avf "/ctx/system_files"/. /
 
-# Keep the real Fedora VERSION_ID from the base image (bootc-image-builder
-# rejects images whose os-release VERSION_ID doesn't match a Fedora release).
-if [[ -n "${BASE_VERSION_ID}" ]]; then
-    sed -i "s/^VERSION_ID=.*/${BASE_VERSION_ID}/" /usr/lib/os-release
+# Restore the base image's ID / ID_LIKE / VERSION_ID (bootc-image-builder
+# rejects images whose os-release identity doesn't match the base distro).
+if [[ -n "${BASE_OS_RELEASE}" ]]; then
+    while IFS= read -r line; do
+        key="${line%%=*}"
+        sed -i "s|^${key}=.*|${line}|" /usr/lib/os-release
+    done <<< "${BASE_OS_RELEASE}"
+fi
+
+# If Ghostty isn't available (CentOS Stream), keep the base default terminal:
+# strip the ghostty entries from the dconf keyfile and the GSettings override
+# so nothing points at a binary that doesn't exist.
+if ! command -v ghostty >/dev/null 2>&1; then
+    sed -i "/^\[org.gnome.desktop.default-applications.terminal\]/,+1d" /etc/dconf/db/site.d/01-calos 2>/dev/null || true
+    sed -i "s/, 'com.mitchellh.ghostty.desktop'//" /etc/dconf/db/site.d/01-calos 2>/dev/null || true
+    sed -i "/^\[org.gnome.desktop.default-applications.terminal\]/,+1d" /usr/share/glib-2.0/schemas/zz_calos.gschema.override 2>/dev/null || true
+    sed -i "s/, 'com.mitchellh.ghostty.desktop'//" /usr/share/glib-2.0/schemas/zz_calos.gschema.override 2>/dev/null || true
 fi
 
 # Make CalOS the default fastfetch config for every user. Override the base
@@ -252,8 +327,8 @@ glib-compile-schemas /usr/share/glib-2.0/schemas/
 ### Stamp release version/codename into os-release (versioned builds only)
 # Rolling builds keep the committed os-release as-is. Versioned builds pass
 # CALOS_VERSION / CALOS_CODENAME (from a git tag like v1.2.0) and override only
-# VERSION and PRETTY_NAME — VERSION_ID stays Fedora's so bootc-image-builder
-# keeps accepting the file.
+# VERSION and PRETTY_NAME — ID/ID_LIKE/VERSION_ID stay the base's so
+# bootc-image-builder keeps accepting the file.
 if [[ -n "${CALOS_VERSION:-}" && -n "${CALOS_CODENAME:-}" ]]; then
     sed -i "s/^VERSION=.*/VERSION=\\\"${CALOS_VERSION} (${CALOS_CODENAME})\\\"/" /usr/lib/os-release
     sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\\\"CalOS ${CALOS_CODENAME}\\\"/" /usr/lib/os-release
@@ -291,13 +366,6 @@ fi
 
 ### Compile dconf databases
 dconf update
-
-# Use a COPR Example:
-#
-# dnf5 -y copr enable ublue-os/staging
-# dnf5 -y install package
-# Disable COPRs so they don't end up enabled on the final image:
-# dnf5 -y copr disable ublue-os/staging
 
 #### Example for enabling a System Unit File
 

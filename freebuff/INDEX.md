@@ -14,7 +14,10 @@
 - **Architectures:** x86_64 (default) and ARM64. The ARM64 variant builds on
   the Bluefin LTS arm64 tag (`bluefin:lts-testing-arm64`) because Bluefin's
   `stable` tag is x86_64 only; the NVIDIA variant is x86_64 only (no arm64
-  NVIDIA base exists from ublue-os).
+  NVIDIA base exists from ublue-os). **The arm64 base is CentOS Stream 10**
+  (Bluefin publishes no Fedora-based ARM64 image), so `build.sh` is
+  distro-aware (dnf4 + EPEL 10, direct binaries for zoxide/lazygit, no
+  Ghostty on arm64).
 - **How it's built:** a single `Containerfile` + `build_files/build.sh`, driven by
   `Justfile` recipes, built daily in CI (on `ubuntu-24.04` for amd64 and
   `ubuntu-24.04-arm` for arm64) and signed with Cosign.
@@ -158,8 +161,14 @@ releases get e.g. "CalOS Superior".
     so every new user gets the starter config; first launch installs plugins.
 11. **ARM64 tracks the Bluefin LTS arm64 tag** (`bluefin:lts-testing-arm64`)
     and is published as `:latest-arm64` / `:vX.Y.Z-arm64` — it is NOT merged
-    into the `:latest` tag because the amd64 and arm64 bases are different
-    Fedora branches. NVIDIA has no arm64 build (no ublue arm64 NVIDIA base).
+    into the `:latest` tag because the amd64 and arm64 bases differ: **arm64
+    is CentOS Stream 10** (Bluefin ships no Fedora-based ARM64 image), x86_64
+    is Fedora. `build.sh` handles both: dnf4 + EPEL 10 on CS10, Ghostty
+    skipped on arm64 (no package/binary — the ghostty dconf/gsettings
+    defaults are stripped), zoxide/lazygit installed from official GitHub
+    binaries, and os-release `ID`/`ID_LIKE`/`VERSION_ID` restored from the
+    base so bootc-image-builder accepts the image. NVIDIA has no arm64 build
+    (no ublue arm64 NVIDIA base).
 12. **End users get a separate, small Justfile** (`/usr/share/calos/Justfile`,
     also copied to `/etc/just/`) with `just update` / `check` / `rollback` /
     `status` / `info` / `switch-latest` plus aliases (`u`, `c`, `r`, `v`, `i`).

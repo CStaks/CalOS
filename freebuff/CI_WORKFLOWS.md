@@ -20,6 +20,14 @@ ARM64 exists for the standard variant only (Bluefin's `stable` tag is x86_64
 only; the arm64 tags are LTS testing; no arm64 NVIDIA base exists). Each combo
 is built natively on its own runner — no QEMU emulation.
 
+**The arm64 base is CentOS Stream 10**, not Fedora — Bluefin publishes no
+Fedora-based ARM64 image. `build.sh` is distro-aware: on CentOS Stream it uses
+dnf4 + EPEL 10 (neovim, ripgrep, fd-find, fastfetch, just), installs zoxide and
+lazygit from official GitHub binaries, and skips Ghostty (no CentOS Stream
+package or official Linux binary) — the ghostty dconf/gsettings defaults are
+stripped and the base terminal is kept. os-release `ID`/`ID_LIKE`/`VERSION_ID`
+are restored from the base so bootc-image-builder accepts the image.
+
 Flow: checkout → free up space (runner cleanup action, arch-aware)
 → `just check` → resolve image name/tag → **`just build` with `BASE_IMAGE`
 build-arg** → **`just ostree-rechunk`** (smaller delta updates) → generate
