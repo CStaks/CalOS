@@ -1,0 +1,63 @@
+name: Bug report
+description: Report something that isn't working correctly
+title: "[Bug]: "
+labels:
+
+* bug
+  body:
+
+* type: markdown
+  attributes:
+  value: |
+  Thanks for taking the time to report a bug!
+  Please provide as much detail as possible so we can investigate it.
+
+* type: textarea
+  id: description
+  attributes:
+  label: What happened?
+  description: Describe the problem clearly and explain what you expected to happen.
+  placeholder: Tell us what went wrong and what you expected instead.
+  validations:
+  required: true
+
+* type: textarea
+  id: reproduction
+  attributes:
+  label: Steps to reproduce
+  description: Tell us how to reproduce the problem.
+  placeholder: |
+  1. Do this...
+  2. Then do this...
+  3. The problem occurs...
+  validations:
+  required: true
+
+* type: input
+  id: version
+  attributes:
+  label: Version
+  description: What version of the project are you using?
+  placeholder: "e.g. 1.2.0"
+  validations:
+  required: true
+
+* type: input
+  id: environment
+  attributes:
+  label: Environment
+  description: Include your operating system and any other relevant environment information.
+  placeholder: "e.g. Windows 11, Ubuntu 24.04, macOS 15"
+
+* type: textarea
+  id: logs
+  attributes:
+  label: Logs or error messages
+  description: Paste any relevant logs or error messages.
+  render: text
+
+* type: textarea
+  id: additional
+  attributes:
+  label: Additional context
+  description: Add screenshots, links, or anything else that might help.
