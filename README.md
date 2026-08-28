@@ -1,4 +1,11 @@
 # CalOS
+
+[![Build](https://github.com/callenflynn/CalOS/actions/workflows/build.yml/badge.svg)](https://github.com/callenflynn/CalOS/actions/workflows/build.yml)
+[![Latest Release](https://img.shields.io/github/v/release/callenflynn/CalOS)](https://github.com/callenflynn/CalOS/releases)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/calos)](https://artifacthub.io/packages/search?repo=calos)
+[![License](https://img.shields.io/github/license/callenflynn/CalOS)](LICENSE)
+
+
 <img height="150" src="CalOS/calos-github-social.png">
 
 A custom Fedora Atomic desktop built on a Fedora Atomic base image.
