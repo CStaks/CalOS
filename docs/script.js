@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hide = (el) => el?.classList.add('is-hidden');
 
     // NVIDIA builds are x86_64 only, so the NVIDIA path has one fewer question.
-    const totalSteps = () => (state.graphics === 'nvidia' ? 3 : 4);
+    const totalSteps = () => (state.arch === 'arm64' ? 3 : 4);
 
     const renderQuestion = (label, title, choices) => {
         if (!stepLabel || !questionTitle || !choiceGrid) return;
@@ -38,22 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
         questionPanel?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
-    const askGraphics = () => {
-        renderQuestion(`Question 1 of ${totalSteps()}`, 'What graphics card do you have?', [
-            { text: 'AMD or Intel', detail: 'Use the Standard build', attributes: { graphics: 'standard' } },
-            { text: 'NVIDIA', detail: 'Use the NVIDIA build (x86_64 only)', attributes: { graphics: 'nvidia' } },
-        ]);
-    };
-
     const askArch = () => {
-        renderQuestion(`Question 2 of ${totalSteps()}`, 'What kind of computer is it?', [
+        renderQuestion(`Question 1 of ${totalSteps()}`, 'What processor architecture are you using?', [
             { text: 'x86_64', detail: 'Intel or AMD — what most computers have', attributes: { arch: 'x86_64' } },
             { text: 'ARM64', detail: 'Apple Silicon, Raspberry Pi-style boards, and other ARM systems', attributes: { arch: 'arm64' } },
         ]);
     };
 
+    const askGraphics = () => {
+        renderQuestion(`Question 2 of ${totalSteps()}`, 'What graphics card do you have?', [
+            { text: 'AMD or Intel', detail: 'Use the Standard build', attributes: { graphics: 'standard' } },
+            { text: 'NVIDIA', detail: 'Use the NVIDIA build (x86_64 only)', attributes: { graphics: 'nvidia' } },
+        ]);
+    };
+
     const askInstall = () => {
-        const step = state.graphics === 'nvidia' ? 2 : 3;
+        const step = state.arch === 'arm64' ? 2 : 3;
         renderQuestion(`Question ${step} of ${totalSteps()}`, 'Are you installing on hardware or in a VM?', [
             { text: 'Hardware', detail: 'Install from an ISO', attributes: { install: 'hardware' } },
             { text: 'Virtual machine', detail: 'Choose QCOW2 or VMDK next', attributes: { install: 'vm' } },
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const askVm = () => {
-        const step = state.graphics === 'nvidia' ? 3 : 4;
+        const step = state.arch === 'arm64' ? 3 : 4;
         const choices = state.graphics === 'nvidia'
             ? [{ text: 'QEMU or GNOME Boxes', detail: 'Download QCOW2 (NVIDIA VMDK is not available)', attributes: { vm: 'qcow2' } }]
             : [
@@ -120,12 +120,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!button) return;
         if (button.dataset.graphics) {
             state.graphics = button.dataset.graphics;
-            state.arch = state.install = state.vm = '';
-            if (state.graphics === 'nvidia') askInstall();
-            else askArch();
+            state.arch = state.install = state.vm = '';askInstall();
         } else if (button.dataset.arch) {
             state.arch = button.dataset.arch;
-            askInstall();
+            if (state.arch === 'arm64') {
+                askInstall();
+            }
+             else {askGraphics();}
         } else if (button.dataset.install) {
             state.install = button.dataset.install;
             if (state.install === 'vm') askVm();
@@ -138,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     chooserReset?.addEventListener('click', () => {
         state.graphics = state.arch = state.install = state.vm = '';
-        askGraphics();
+        askArch();
     });
 
     function showRecommendation(title, copy, filename) {
@@ -159,5 +160,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render the first question on load (also keeps the step label accurate
     // for the NVIDIA path, which has one fewer question).
-    askGraphics();
+    askArch();
 });
