@@ -1,1 +1,1 @@
-window.CALOS_LATEST_RELEASE = "1.1.3";
+window.CALOS_LATEST_RELEASE = "1.1.4";
