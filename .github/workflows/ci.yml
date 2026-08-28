@@ -16,6 +16,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
       - name: Run Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
@@ -27,8 +28,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@v2
+        uses: ludeeus/action-shellcheck@2.0.0
 
   zizmor:
     name: Lint Workflows
@@ -36,8 +38,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
       - name: Run Zizmor
-        uses: woodruffw/zizmor-action@v1
+        uses: woodruffw/zizmor-github-action@v1
 
   notify:
     name: Notify Discord
