@@ -1,0 +1,24 @@
+apiVersion: v1
+entries:
+  calos:
+    - apiVersion: v1
+      name: calos
+      description: CalOS immutable bootc-based Linux desktop distribution
+      version: 1.1.5
+      appVersion: latest
+      type: application
+      home: https://callenflynn.github.io/CalOS/
+      sources:
+        - https://github.com/callenflynn/CalOS
+      maintainers:
+        - name: Callen Flynn
+          email: cal@callen.page
+      urls:
+        - oci://ghcr.io/callenflynn/calos:latest
+      annotations:
+        artifacthub.io/category: operating-system
+        artifacthub.io/license: Apache-2.0
+        artifacthub.io/images: |
+          - name: CalOS
+            image: ghcr.io/callenflynn/calos:latest
+generated: "2026-08-28T00:00:00Z"

@@ -21,6 +21,14 @@ on:
       event_name:
         required: true
         type: string
+      report:
+        required: false
+        default: ""
+        type: string
+      report_url:
+        required: false
+        default: ""
+        type: string
     secrets:
       DISCORD_WEBHOOK_1:
         required: false
@@ -40,6 +48,8 @@ jobs:
           REF_NAME: ${{ inputs.ref_name }}
           SHA: ${{ inputs.sha }}
           EVENT_NAME: ${{ inputs.event_name }}
+          REPORT: ${{ inputs.report }}
+          REPORT_URL: ${{ inputs.report_url }}
         run: |
           set -euo pipefail
           if [[ -z "$DISCORD_WEBHOOK" ]]; then
@@ -50,20 +60,25 @@ jobs:
           import json
           import os
           status = os.environ["WORKFLOW_STATUS"]
-          color = {"success": 3066993, "failure": 15158332, "cancelled": 9807270}.get(status, 9807270)
+          color = {"success": 3066993, "failure": 15158332, "cancelled": 9807270, "skipped": 9807270}.get(status, 9807270)
           ref = os.environ["REF_NAME"] or os.environ["SHA"][:12]
           repository = os.environ["REPOSITORY"]
           sha = os.environ["SHA"]
+          report = os.environ["REPORT"].strip()
+          report_url = os.environ["REPORT_URL"].strip() or os.environ["RUN_URL"]
+          fields = [
+              {"name": "Git ref", "value": f"`{ref}`", "inline": True},
+              {"name": "Commit", "value": f"[`{sha[:12]}`](https://github.com/{repository}/commit/{sha})", "inline": True},
+              {"name": "Event", "value": f"`{os.environ['EVENT_NAME']}`", "inline": True},
+          ]
+          if report:
+              fields.append({"name": "Detailed report", "value": report[:1024], "inline": False})
           print(json.dumps({"embeds": [{
               "title": f"{os.environ['WORKFLOW_NAME']} — {status}",
               "url": os.environ["RUN_URL"],
-              "description": f"[{repository}]({os.environ['RUN_URL']}) finished with **{status}**.",
+              "description": f"[{repository}]({os.environ['RUN_URL']}) finished with **{status}**. [View detailed report]({report_url})",
               "color": color,
-              "fields": [
-                  {"name": "Git ref", "value": f"`{ref}`", "inline": True},
-                  {"name": "Commit", "value": f"[`{sha[:12]}`](https://github.com/{repository}/commit/{sha})", "inline": True},
-                  {"name": "Event", "value": f"`{os.environ['EVENT_NAME']}`", "inline": True},
-              ],
+              "fields": fields,
               "footer": {"text": "CalOS GitHub Actions"},
           }]}))
           PY

@@ -120,7 +120,7 @@ locally. Public recipes:
 | `just clean` | Remove `_build*`, `output/`, manifests |
 | `just build [image] [tag] [extra_args]` | podman build with OCI/ArtifactHub labels; `extra_args` = `--build-arg KEY=VALUE` pairs (CI passes `BASE_IMAGE=...`) |
 | `just rechunk [image] [tag]` | **Chunkah** (new distro-agnostic) chunked OCI re-split for smaller deltas |
-| `just ostree-rechunk [image] [tag]` | **rpm-ostree** chunked re-split (root required; what CI uses) |
+| `just ostree-rechunk [image] [tag]` | Legacy rpm-ostree chunked re-split (root required; prefer `just rechunk`) |
 | `just generate-default-tag` | Echo default tag (CI appends variant suffix) |
 | `just generate-build-tags` | Emit `latest`, `latest-YYYYMMDD`, `latest-SHA`, `latest-DATE-SHA` |
 | `just tag-images [image] [tag] [tags...]` | Re-tag a built image to all aliases |
@@ -138,7 +138,7 @@ Private helpers: `sudoif` (root-or-sudo wrapper), `_rootful_load_image`
 > never baked into the image. End users update via Universal Blue's `ujust
 > update` (inherited from Bluefin), so no end-user Justfile is shipped.
 
-**Local dev loop:** `just build` → (optional `just ostree-rechunk`) →
+**Local dev loop:** `just build` → (optional `just rechunk`) →
 `just build-qcow2` → `just run-vm-qcow2`. Disk images land in `output/`.
 
 The ISO recipes use `disk_config/iso-gnome.toml` by default, matching the CI

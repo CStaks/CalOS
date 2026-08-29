@@ -30,4 +30,6 @@ jobs:
       ref_name: ${{ github.ref_name }}
       sha: ${{ github.event.workflow_run.head_sha }}
       event_name: ${{ github.event_name }}
+      report: "Renovate automerge result: ${{ needs.automerge.result }}"
+      report_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     secrets: inherit
