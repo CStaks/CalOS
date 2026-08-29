@@ -460,6 +460,11 @@ button:focus-visible {
     background: var(--bg-color);
 }
 
+.footer-logo-badge img {
+    width: 100%;
+    height: auto;
+}
+
 .footer-logo-svg {
     width: 26px;
     height: 26px;
