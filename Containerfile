@@ -46,10 +46,10 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
 ## Bluefin / ublue-os). These override the base labels on the final image;
 ## the ARG defaults keep values correct even when not passed as build args.
 ARG IMAGE_NAME="calos"
-ARG REPO_ORGANIZATION="callenflynn"
+ARG REPO_ORGANIZATION="CStaks"
 ARG IMAGE_DESC="CalOS - A custom Fedora Atomic desktop"
 ARG IMAGE_KEYWORDS="calos,bootc,oci,linux,atomic,gnome"
-ARG IMAGE_LOGO_URL="https://raw.githubusercontent.com/callenflynn/CalOS/main/CalOS/CalOS.png"
+ARG IMAGE_LOGO_URL="https://raw.githubusercontent.com/CStaks/CalOS/main/CalOS/CalOS.png"
 
 LABEL org.opencontainers.image.title="${IMAGE_NAME}"
 LABEL org.opencontainers.image.vendor="${REPO_ORGANIZATION}"

@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     githubBtn?.addEventListener('click', () => {
-        window.location.href = 'https://github.com/callenflynn/CalOS';
+        window.location.href = 'https://github.com/CStaks/CalOS';
     });
 
     wikiBtn?.addEventListener('click', () => {
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const card = document.getElementById('github-card');
     if (!card) return;
     try {
-        const res = await fetch('https://api.github.com/repos/callenflynn/CalOS');
+        const res = await fetch('https://api.github.com/repos/CStaks/CalOS');
         if (!res.ok) throw new Error(`GitHub API responded ${res.status}`);
         const data = await res.json();
         card.querySelectorAll('[data-field]').forEach((el) => {

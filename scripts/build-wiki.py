@@ -29,7 +29,7 @@ LAYOUT_FILE = REPO_ROOT / "docs" / "wiki-layout.json"
 WIKI_SRC = REPO_ROOT / "docs" / "wiki-src"
 WIKI_OUT = REPO_ROOT / "docs" / "wiki"
 CSS_LINK = "../wiki.css"
-MAIN_SITE_URL = "https://callenflynn.github.io/CalOS/"
+MAIN_SITE_URL = "https://CStaks.github.io/CalOS/"
 INDEX_SLUG = "index"
 
 
