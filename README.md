@@ -81,13 +81,13 @@ From any bootc-based system (Bazzite, Aurora, Fedora Atomic, or another bootc im
 
 ```bash
 # Standard / AMD / Intel (x86_64)
-sudo bootc switch ghcr.io/CStaks/calos:latest
+sudo bootc switch ghcr.io/cstaks/calos:latest
 
 # ARM64 (Apple Silicon, Raspberry Pi-style boards)
-sudo bootc switch ghcr.io/CStaks/calos:latest-arm64
+sudo bootc switch ghcr.io/cstaks/calos:latest-arm64
 
 # NVIDIA GPUs (x86_64 only)
-sudo bootc switch ghcr.io/CStaks/calos:latest-nvidia
+sudo bootc switch ghcr.io/cstaks/calos:latest-nvidia
 ```
 
 After either switch, update the installed system with:
@@ -101,13 +101,13 @@ To pin a specific release instead of the rolling `latest` (replace v1.1.4 with t
 
 ```bash
 # Standard / AMD / Intel (x86_64)
-sudo bootc switch ghcr.io/CStaks/calos:v1.1.4
+sudo bootc switch ghcr.io/cstaks/calos:v1.1.4
 
 # ARM64
-sudo bootc switch ghcr.io/CStaks/calos:v1.1.4-arm64
+sudo bootc switch ghcr.io/cstaks/calos:v1.1.4-arm64
 
 # NVIDIA hardware (x86_64)
-sudo bootc switch ghcr.io/CStaks/calos:v1.1.4-nvidia
+sudo bootc switch ghcr.io/cstaks/calos:v1.1.4-nvidia
 ```
 
 Reboot to apply. For the rolling channel, `bootc update` checks the selected CalOS `:latest` image and stages updates for the next reboot. Versioned tags such as `:v1.1.1` are pinned and do not move automatically.
@@ -140,7 +140,7 @@ There are also plain aliases if you prefer to skip `ujust`:
 calos-update        # sudo bootc update && sudo reboot
 calos-rollback      # sudo bootc rollback && sudo reboot
 calos-version       # sudo bootc status
-calos-switch-latest # sudo bootc switch ghcr.io/CStaks/calos:latest && sudo reboot
+calos-switch-latest # sudo bootc switch ghcr.io/cstaks/calos:latest && sudo reboot
 ```
 
 ## What's Included
