@@ -199,6 +199,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      # Ensure no stale podman state from the runner or previous jobs
+      # interferes with bootc-image-builder (fixes libpod_lock / overlay
+      # busy errors seen on ARM64 and occasional x86_64 runners).
+      - name: Reset podman storage
+        shell: bash
+        run: |
+          set +e
+          sudo podman system reset --force 2>/dev/null
+          # Kill any lingering podman processes holding storage locks
+          sudo pkill -9 podman 2>/dev/null || true
+          sudo rm -rf /var/lib/containers/storage /run/containers/storage
+          sudo mkdir -p /var/lib/containers/storage /run/containers/storage
+          # Reset lock files that may be stale
+          sudo rm -f /run/libpod_lock /run/libpod/pause.pid 2>/dev/null || true
+          echo 'podman storage reset done'
+
       - name: Build disk images
         id: build
         uses: osbuild/bootc-image-builder-action@8661cd3832544ad68c12dcde8681b13ab0f56a8d # main
