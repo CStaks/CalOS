@@ -97,17 +97,17 @@ sudo bootc update
 sudo reboot
 ```
 
-To pin a specific release instead of the rolling `latest` (replace v1.1.4 with the version you want to use):
+To pin a specific release instead of the rolling `latest` (replace v1.1.5 with the version you want to use):
 
 ```bash
 # Standard / AMD / Intel (x86_64)
-sudo bootc switch ghcr.io/cstaks/calos:v1.1.4
+sudo bootc switch ghcr.io/cstaks/calos:v1.1.5
 
 # ARM64
-sudo bootc switch ghcr.io/cstaks/calos:v1.1.4-arm64
+sudo bootc switch ghcr.io/cstaks/calos:v1.1.5-arm64
 
 # NVIDIA hardware (x86_64)
-sudo bootc switch ghcr.io/cstaks/calos:v1.1.4-nvidia
+sudo bootc switch ghcr.io/cstaks/calos:v1.1.5-nvidia
 ```
 
 Reboot to apply. For the rolling channel, `bootc update` checks the selected CalOS `:latest` image and stages updates for the next reboot. Versioned tags such as `:v1.1.1` are pinned and do not move automatically.
@@ -120,9 +120,9 @@ Prebuilt qcow2 + vmdk (VMs) and anaconda-iso (USB/installer) images are built da
 - **standard ARM64** — same set (Apple Silicon, Raspberry Pi-style boards)
 - **nvidia x86_64** — NVIDIA physical hardware (qcow2, installer ISO); there is no NVIDIA VMDK because VMware virtualizes the GPU, and no ARM64 NVIDIA build
 
-Files are named `calos-<version>_<arch>[<variant>].<ext>` — for example `calos-v1.1.4_x86_64.qcow2`, `calos-v1.1.4_arm64.iso`, `calos-v1.1.4_x86_64-nvidia.iso`. On the rolling channel the version token is `latest` (`calos-latest_x86_64.qcow2`); on tagged releases it is the tag (`calos-v1.1.4_x86_64.qcow2`).
+Files are named `calos-<version>_<arch>[<variant>].<ext>` — for example `calos-v1.1.5_x86_64.qcow2`, `calos-v1.1.5_arm64.iso`, `calos-v1.1.5_x86_64-nvidia.iso`. On the rolling channel the version token is `latest` (`calos-latest_x86_64.qcow2`); on tagged releases it is the tag (`calos-v1.1.5_x86_64.qcow2`).
 
-Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/CStaks/calos/releases). Use the latest GitHub Release to identify the current version; the actual files are linked from that release into its matching SourceForge folder (for example `/1.1.4/`). SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page.
+Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/CStaks/calos/releases). Use the latest GitHub Release to identify the current version; the actual files are linked from that release into its matching SourceForge folder (for example `/1.1.5/`). SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page.
 
 ## Updating
 

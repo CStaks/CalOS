@@ -147,9 +147,6 @@ rm -rf "$LAZYVIM_SKEL/.git"
 ### Shell environment: starship, zoxide, aliases
 # Profile.d script initializes CalOS defaults for every login shell.
 cat > /etc/profile.d/calos.sh << 'CALOSPROFILEEOF'
-# CalOS - terminal info defaults
-export FASTFETCH_CONFIG=/usr/share/fastfetch/presets/calos.jsonc
-
 # CalOS - Starship prompt
 if command -v starship >/dev/null 2>&1; then
     eval "$(starship init bash)"
@@ -180,7 +177,6 @@ if [ -f /etc/zshrc ]; then
     if ! grep -q 'calos' /etc/zshrc; then
         cat >> /etc/zshrc << 'CALOSZSHEOF'
 # CalOS terminal defaults (aliases, prompt)
-export FASTFETCH_CONFIG=/usr/share/fastfetch/presets/calos.jsonc
 
 # CalOS - handy aliases (no sudo needed, bootc handles it)
 alias calos-update='sudo bootc update && sudo reboot'
@@ -223,6 +219,14 @@ if [[ -n "${BASE_OS_RELEASE}" ]]; then
     done <<< "${BASE_OS_RELEASE}"
 fi
 
+# Ensure /etc/os-release resolves to the CalOS-branded /usr/lib/os-release.
+# fastfetch (and most system tools) read /etc/os-release FIRST, and only fall
+# back to /usr/lib/os-release when fields are missing. If the base image ships
+# a plain file at /etc/os-release, installed systems keep reporting the base
+# distro (e.g. "Bluefin stable") instead of CalOS. On Fedora this is already
+# a symlink; force it so branding always wins.
+ln -sf ../usr/lib/os-release /etc/os-release
+
 # If Ghostty isn't available (CentOS Stream), keep the base default terminal:
 # strip the ghostty entries from the dconf keyfile and the GSettings override
 # so nothing points at a binary that doesn't exist.
@@ -235,7 +239,14 @@ fi
 
 # Make CalOS the default fastfetch config for every user. Override the base
 # image's profile and preset last so inherited Bluefin ASCII art cannot win.
-mkdir -p /etc/skel/.config/fastfetch /usr/share/fastfetch/presets
+#
+# fastfetch loads `fastfetch/config.jsonc` from its config dirs in order:
+# ~/.config, $HOME, $XDG_CONFIG_DIRS, /etc/xdg, /etc. (There is no
+# FASTFETCH_CONFIG env var in fastfetch.) So the system-wide copy at
+# /etc/fastfetch/config.jsonc applies to every user, the skel copy seeds
+# new users' ~/.config/fastfetch/config.jsonc, and presets/calos.jsonc is
+# available on demand via `fastfetch --config calos`.
+mkdir -p /etc/skel/.config/fastfetch /usr/share/fastfetch/presets /etc/fastfetch
 cat > /etc/skel/.config/fastfetch/config.jsonc << 'CALOSFASTFETCHEOF'
 {
     "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
@@ -246,9 +257,8 @@ cat > /etc/skel/.config/fastfetch/config.jsonc << 'CALOSFASTFETCHEOF'
 }
 CALOSFASTFETCHEOF
 cp /etc/skel/.config/fastfetch/config.jsonc /usr/share/fastfetch/presets/calos.jsonc
-# Replace the inherited global config if present; FASTFETCH_CONFIG points here.
-mkdir -p /etc/fastfetch
-cp /etc/skel/.config/fastfetch/config.jsonc /etc/fastfetch/config.jsonc 2>/dev/null || true
+# System-wide default; used only when a user has no ~/.config copy of their own.
+cp /etc/skel/.config/fastfetch/config.jsonc /etc/fastfetch/config.jsonc
 # Compile GSettings schemas so our wallpaper/favorites override takes effect
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 

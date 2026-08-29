@@ -72,8 +72,14 @@ Bluefin), so no custom Justfile is shipped.
 ### Terminal info tools
 - `usr/share/fastfetch/calos-logo.txt` — the ASCII CalOS logo (source of truth).
 - `usr/share/fastfetch/presets/calos.jsonc` + `etc/skel/.config/fastfetch/config.jsonc`
-  — point fastfetch at the logo file. `/etc/profile.d/calos.sh` also exports
-  `FASTFETCH_CONFIG` so the CalOS preset wins over a base-image default.
+  — point fastfetch at the logo file. fastfetch has **no `FASTFETCH_CONFIG` env
+  var**; it loads `fastfetch/config.jsonc` from its config dirs in order
+  (`~/.config`, `$HOME`, `$XDG_CONFIG_DIRS`, `/etc/xdg`, `/etc`). `build.sh`
+  writes the same config to `/etc/fastfetch/config.jsonc` (system-wide),
+  `/etc/skel/.config/fastfetch/` (new users), and `presets/calos.jsonc`
+  (available via `fastfetch --config calos`). `build.sh` also symlinks
+  `/etc/os-release` to `/usr/lib/os-release` so fastfetch reports CalOS,
+  not the base distro.
 - `etc/skel/.config/neofetch/config.conf` — neofetch uses the same ASCII file with
   brand-colored ANSI palette `(1 6 4 12 8 14)`.
 
