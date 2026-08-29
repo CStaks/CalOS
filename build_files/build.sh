@@ -164,7 +164,7 @@ fi
 alias calos-update='sudo bootc update && sudo reboot'
 alias calos-rollback='sudo bootc rollback && sudo reboot'
 alias calos-version='sudo bootc status'
-alias calos-switch-latest='sudo bootc switch ghcr.io/callenflynn/calos:latest && sudo reboot'
+alias calos-switch-latest='sudo bootc switch ghcr.io/cstaks/calos:latest && sudo reboot'
 CALOSPROFILEEOF
 chmod +x /etc/profile.d/calos.sh
 # Make the same defaults available in interactive (GUI terminal) bash shells,
@@ -186,7 +186,7 @@ export FASTFETCH_CONFIG=/usr/share/fastfetch/presets/calos.jsonc
 alias calos-update='sudo bootc update && sudo reboot'
 alias calos-rollback='sudo bootc rollback && sudo reboot'
 alias calos-version='sudo bootc status'
-alias calos-switch-latest='sudo bootc switch ghcr.io/callenflynn/calos:latest && sudo reboot'
+alias calos-switch-latest='sudo bootc switch ghcr.io/cstaks/calos:latest && sudo reboot'
 
 # CalOS - Starship prompt (zsh)
 if command -v starship >/dev/null 2>&1; then

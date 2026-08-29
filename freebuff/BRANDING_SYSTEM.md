@@ -22,7 +22,7 @@ fastfetch/neofetch, starship, and wallpapers.
 ```
 NAME="CalOS"  ID="fedora"  ID_LIKE="fedora"  VERSION="CalOS"  VERSION_ID="43"
 PRETTY_NAME="CalOS"  LOGO="/usr/share/pixmaps/CalOS.svg"
-HOME_URL/SUPPORT_URL/BUG_REPORT_URL → github.com/callenflynn/CalOS
+HOME_URL/SUPPORT_URL/BUG_REPORT_URL → github.com/CStaks/CalOS
 ```
 `ID`/`ID_LIKE` stay `fedora` (bootc-image-builder requires it). `VERSION_ID`
 is **restored from the base image at build time** — `build.sh` captures it
@@ -30,7 +30,7 @@ before the `system_files/` overlay and re-applies it after, so the committed
 value is a placeholder that never goes stale. Rolling builds keep the generic
 `VERSION`/`PRETTY_NAME`; versioned tag builds stamp `VERSION="1.2 (Superior)"`
 and `PRETTY_NAME="CalOS Superior"`. The repository URLs use the actual owner,
-`callenflynn` (Callen Flynn).
+`CStaks`.
 
 ### GRUB (`etc/default/grub`)
 `GRUB_DISTRIBUTOR="CalOS"`, highlight color `#FF3B00/black`, `rhgb quiet` cmdline,

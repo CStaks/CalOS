@@ -6,7 +6,7 @@
 ## Project at a Glance
 
 - **What it is:** CalOS, a custom immutable Fedora/bootc desktop OS layered on Universal Blue/Bluefin.
-- **Distribution:** OCI images at `ghcr.io/callenflynn/calos`, plus ISO, QCOW2, and VMDK artifacts on SourceForge.
+- **Distribution:** OCI images at `ghcr.io/cstaks/calos`, plus ISO, QCOW2, and VMDK artifacts on SourceForge.
 - **Architectures:** x86_64 and ARM64. ARM64 uses Bluefin's CentOS Stream 10 base; NVIDIA is x86_64-only.
 - **Build:** `Containerfile` + `build_files/build.sh`, driven locally by the developer `Justfile` and in GitHub Actions.
 - **Website/wiki:** static GitHub Pages site under `docs/`; `scripts/build-wiki.py` generates wiki pages from `docs/wiki-src/`.
