@@ -27,6 +27,11 @@ Read [`freebuff/INDEX.md`](freebuff/INDEX.md) first. It is the durable repositor
 - [`freebuff/BRANDING_SYSTEM.md`](freebuff/BRANDING_SYSTEM.md) — every CalOS branding surface and the inherited Bluefin override behavior.
 - [`freebuff/CI_WORKFLOWS.md`](freebuff/CI_WORKFLOWS.md) — workflow triggers, build matrices, releases, CodeQL, Hadolint, Renovate, and signing.
 
+## Contribution rules
+
+- **Always open a pull request.** Never commit directly to `main`. Create a feature branch, push it, and open a PR against `main` so CI checks run and changes can be reviewed.
+- Follow [CONTRIBUTING.md](CONTRIBUTING.md) for the full PR workflow, coding style (shell, GSettings, packages), testing steps, and commit message conventions.
+
 ## Important conventions
 
 - Preserve existing user changes; do not reset or clean the working tree.
