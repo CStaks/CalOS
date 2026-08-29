@@ -202,8 +202,8 @@ B&W
 
 Alternate Logos
 
-<img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/CalOS-71aab9.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/CalOS-7a899c.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-electric-green.png?raw=true" height=120>
+<img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/CalOS-71aab9.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/CalOS-7a899c.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-electric-green.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-logo-light.png?raw=true" height=120>
 
 Social/OpenGraphs
 
- <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-github-social-electric-green.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-github-social.webp?raw=true" height=120>
+ <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-github-social-electric-green.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-github-social.webp?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/light-github-social.png?raw=true" height=120>
