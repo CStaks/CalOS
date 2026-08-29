@@ -188,21 +188,24 @@ rechunk $target_image=image_name $tag=default_tag:
     CHUNKED_IMAGE="$(podman pull "oci:${CHUNKAH_OUTPUT_DIR}/chunked")"
     podman tag "${CHUNKED_IMAGE}" "${target_image}:${tag}"
 
-    # Chunkah creates a new image config. Re-apply CalOS metadata by creating
-    # a temporary container from the image, committing it with the desired
-    # labels, then restoring the original tag. This stays within local
-    # containers-storage and avoids `podman image scp`, which requires the
-    # remote machinectl transport on GitHub runners.
-    METADATA_CONTAINER="${target_image//\//_}_metadata_container"
+    # Chunkah creates a new image config. Re-apply CalOS metadata using a
+    # temporary Containerfile, which is the most reliable way to set OCI
+    # labels across all Podman/CI environments without quoting issues.
+    # Just variables are captured into bash vars first to avoid Just's parser
+    # choking on dots inside heredocs/echo args (e.g. org.opencontainers).
+    _TITLE="{{ image_name }}"
+    _DESC="{{ image_desc }}"
+    _VENDOR="{{ repo_organization }}"
     METADATA_IMAGE="${target_image}:${tag}-metadata"
-    podman rm -f "${METADATA_CONTAINER}" >/dev/null 2>&1 || true
-    podman create --name "${METADATA_CONTAINER}" "${target_image}:${tag}" /bin/true
-
-    podman commit \
-      --change 'LABEL org.opencontainers.image.title="calos" org.opencontainers.image.description="CalOS - A custom Fedora Atomic desktop" org.opencontainers.image.vendor="callenflynn" org.opencontainers.image.url="https://github.com/callenflynn/CalOS" org.opencontainers.image.source="https://github.com/callenflynn/CalOS"' \
-      "${METADATA_CONTAINER}" "${METADATA_IMAGE}"
-
-    podman rm -f "${METADATA_CONTAINER}"
+    TEMP_DF="$(mktemp)"
+    printf 'FROM %s\n' "${target_image}:${tag}" > "${TEMP_DF}"
+    printf 'LABEL org.opencontainers.image.title=%s\n' "${_TITLE}" >> "${TEMP_DF}"
+    printf 'LABEL org.opencontainers.image.description="%s"\n' "${_DESC}" >> "${TEMP_DF}"
+    printf 'LABEL org.opencontainers.image.vendor=%s\n' "${_VENDOR}" >> "${TEMP_DF}"
+    printf 'LABEL org.opencontainers.image.url=https://github.com/%s/%s\n' "${_VENDOR}" "${_TITLE}" >> "${TEMP_DF}"
+    printf 'LABEL org.opencontainers.image.source=https://github.com/%s/%s\n' "${_VENDOR}" "${_TITLE}" >> "${TEMP_DF}"
+    podman build --no-cache --layers=false -f "${TEMP_DF}" -t "${METADATA_IMAGE}" .
+    rm -f "${TEMP_DF}"
     podman tag "${METADATA_IMAGE}" "${target_image}:${tag}"
 
 # Split the image for smaller updates (Classical)!

@@ -203,18 +203,19 @@ CALOSZSHEOF
 fi
 
 ### Overlay CalOS branding files (after all installs — os-release must NOT override the base yet)
-# Capture the base image's distro identity (ID / ID_LIKE / VERSION_ID) before
-# the overlay replaces os-release. bootc-image-builder validates these, and
-# the bases roll between releases (Fedora 43 on x86_64, CentOS Stream 10 on
-# ARM64), so we restore them below instead of shipping hardcoded values that
-# go stale.
-BASE_OS_RELEASE=$(grep -E '^(ID|ID_LIKE|VERSION_ID)=' /usr/lib/os-release || true)
+# Capture the base image's distro identity (ID / ID_LIKE / VERSION_ID /
+# PLATFORM_ID) before the overlay replaces os-release. bootc-image-builder
+# validates these, and the bases roll between releases (Fedora 44 on x86_64,
+# CentOS Stream 10 on ARM64), so we restore them below instead of shipping
+# hardcoded values that go stale.
+BASE_OS_RELEASE=$(grep -E '^(ID|ID_LIKE|VERSION_ID|PLATFORM_ID)=' /usr/lib/os-release || true)
 
 # Copy the contents of system_files/ of the git repo to /
 cp -avf "/ctx/system_files"/. /
 
-# Restore the base image's ID / ID_LIKE / VERSION_ID (bootc-image-builder
-# rejects images whose os-release identity doesn't match the base distro).
+# Restore the base image's ID / ID_LIKE / VERSION_ID / PLATFORM_ID
+# (bootc-image-builder rejects images whose os-release identity doesn't match
+# the base distro).
 if [[ -n "${BASE_OS_RELEASE}" ]]; then
     while IFS= read -r line; do
         key="${line%%=*}"
@@ -257,8 +258,8 @@ glib-compile-schemas /usr/share/glib-2.0/schemas/
 # VERSION and PRETTY_NAME — ID/ID_LIKE/VERSION_ID stay the base's so
 # bootc-image-builder keeps accepting the file.
 if [[ -n "${CALOS_VERSION:-}" && -n "${CALOS_CODENAME:-}" ]]; then
-    sed -i "s/^VERSION=.*/VERSION=\\\"${CALOS_VERSION} (${CALOS_CODENAME})\\\"/" /usr/lib/os-release
-    sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\\\"CalOS ${CALOS_CODENAME}\\\"/" /usr/lib/os-release
+    sed -i "s|^VERSION=.*|VERSION=${CALOS_VERSION} (${CALOS_CODENAME})|" /usr/lib/os-release
+    sed -i "s|^PRETTY_NAME=.*|PRETTY_NAME=CalOS ${CALOS_CODENAME}|" /usr/lib/os-release
 fi
 
 ### Activate CalOS Plymouth boot theme

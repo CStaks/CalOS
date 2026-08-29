@@ -1,16 +1,17 @@
-NAME="CalOS"
-ID="fedora"
-ID_LIKE="fedora"
-# VERSION_ID is restored from the base image at build time (build.sh captures
-# it before the system_files overlay and re-applies it after), so the value
-# here is only a placeholder and never goes stale.
-VERSION_ID="43"
+NAME=CalOS
+ID=fedora
+ID_LIKE=fedora
+# VERSION_ID and PLATFORM_ID are restored from the base image at build time
+# (build.sh captures them before the system_files overlay and re-applies them
+# after), so the values here are placeholders that never go stale.
+VERSION_ID=43
+PLATFORM_ID="platform:f43"
 # Rolling builds keep the generic values below; versioned builds (git tag
 # vX.Y.Z) stamp VERSION and PRETTY_NAME with the release codename instead.
-VERSION="CalOS"
-PRETTY_NAME="CalOS"
+VERSION=CalOS
+PRETTY_NAME=CalOS
 ANSI_COLOR="0;38;2;255;59;0"
-LOGO="/usr/share/pixmaps/CalOS.svg"
-HOME_URL="https://github.com/callenflynn/CalOS"
-SUPPORT_URL="https://github.com/callenflynn/CalOS/issues"
-BUG_REPORT_URL="https://github.com/callenflynn/CalOS/issues"
+LOGO=/usr/share/pixmaps/CalOS.svg
+HOME_URL=https://github.com/callenflynn/CalOS
+SUPPORT_URL=https://github.com/callenflynn/CalOS/issues
+BUG_REPORT_URL=https://github.com/callenflynn/CalOS/issues
