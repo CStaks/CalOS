@@ -197,13 +197,11 @@ rechunk $target_image=image_name $tag=default_tag:
     METADATA_IMAGE="${target_image}:${tag}-metadata"
     podman rm -f "${METADATA_CONTAINER}" >/dev/null 2>&1 || true
     podman create --name "${METADATA_CONTAINER}" "${target_image}:${tag}" /bin/true
+
     podman commit \
-      --change 'LABEL org.opencontainers.image.title=calos' \
-      --change 'LABEL org.opencontainers.image.description=CalOS - A custom Fedora Atomic desktop' \
-      --change 'LABEL org.opencontainers.image.vendor=callenflynn' \
-      --change 'LABEL org.opencontainers.image.url=https://github.com/callenflynn/CalOS' \
-      --change 'LABEL org.opencontainers.image.source=https://github.com/callenflynn/CalOS' \
+      --change 'LABEL org.opencontainers.image.title="calos" org.opencontainers.image.description="CalOS - A custom Fedora Atomic desktop" org.opencontainers.image.vendor="callenflynn" org.opencontainers.image.url="https://github.com/callenflynn/CalOS" org.opencontainers.image.source="https://github.com/callenflynn/CalOS"' \
       "${METADATA_CONTAINER}" "${METADATA_IMAGE}"
+
     podman rm -f "${METADATA_CONTAINER}"
     podman tag "${METADATA_IMAGE}" "${target_image}:${tag}"
 
