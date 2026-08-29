@@ -407,7 +407,7 @@ jobs:
 
           Disk images are hosted on [SourceForge]($SF_URL).
 
-          **Container images:** \`bootc switch ghcr.io/callenflynn/calos:${REF_NAME}\` (x86_64; \`:${REF_NAME}-nvidia\` for NVIDIA hardware, \`:${REF_NAME}-arm64\` for ARM64).
+          **Container images:** \`bootc switch ghcr.io/cstaks/calos:${REF_NAME}\` (x86_64; \`:${REF_NAME}-nvidia\` for NVIDIA hardware, \`:${REF_NAME}-arm64\` for ARM64).
 
           ### Standard x86_64 (AMD / Intel GPUs) — recommended for most users
 
