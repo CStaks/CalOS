@@ -1,9 +1,9 @@
 # CalOS
 
-[![Build](https://github.com/callenflynn/CalOS/actions/workflows/build.yml/badge.svg)](https://github.com/callenflynn/CalOS/actions/workflows/build.yml)
-[![Latest Release](https://img.shields.io/github/v/release/callenflynn/CalOS)](https://github.com/callenflynn/CalOS/releases)
+[![Build](https://github.com/CStaks/CalOS/actions/workflows/build.yml/badge.svg)](https://github.com/CStaks/CalOS/actions/workflows/build.yml)
+[![Latest Release](https://img.shields.io/github/v/release/CStaks/CalOS)](https://github.com/CStaks/CalOS/releases)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/calos)](https://artifacthub.io/packages/search?repo=calos)
-[![License](https://img.shields.io/github/license/callenflynn/CalOS)](LICENSE)
+[![License](https://img.shields.io/github/license/CStaks/CalOS)](LICENSE)
 
 
 <img height="150" src="CalOS/calos-github-social.png">
@@ -81,13 +81,13 @@ From any bootc-based system (Bazzite, Aurora, Fedora Atomic, or another bootc im
 
 ```bash
 # Standard / AMD / Intel (x86_64)
-sudo bootc switch ghcr.io/callenflynn/calos:latest
+sudo bootc switch ghcr.io/CStaks/calos:latest
 
 # ARM64 (Apple Silicon, Raspberry Pi-style boards)
-sudo bootc switch ghcr.io/callenflynn/calos:latest-arm64
+sudo bootc switch ghcr.io/CStaks/calos:latest-arm64
 
 # NVIDIA GPUs (x86_64 only)
-sudo bootc switch ghcr.io/callenflynn/calos:latest-nvidia
+sudo bootc switch ghcr.io/CStaks/calos:latest-nvidia
 ```
 
 After either switch, update the installed system with:
@@ -101,13 +101,13 @@ To pin a specific release instead of the rolling `latest` (replace v1.1.4 with t
 
 ```bash
 # Standard / AMD / Intel (x86_64)
-sudo bootc switch ghcr.io/callenflynn/calos:v1.1.4
+sudo bootc switch ghcr.io/CStaks/calos:v1.1.4
 
 # ARM64
-sudo bootc switch ghcr.io/callenflynn/calos:v1.1.4-arm64
+sudo bootc switch ghcr.io/CStaks/calos:v1.1.4-arm64
 
 # NVIDIA hardware (x86_64)
-sudo bootc switch ghcr.io/callenflynn/calos:v1.1.4-nvidia
+sudo bootc switch ghcr.io/CStaks/calos:v1.1.4-nvidia
 ```
 
 Reboot to apply. For the rolling channel, `bootc update` checks the selected CalOS `:latest` image and stages updates for the next reboot. Versioned tags such as `:v1.1.1` are pinned and do not move automatically.
@@ -122,7 +122,7 @@ Prebuilt qcow2 + vmdk (VMs) and anaconda-iso (USB/installer) images are built da
 
 Files are named `calos-<version>_<arch>[<variant>].<ext>` — for example `calos-v1.1.4_x86_64.qcow2`, `calos-v1.1.4_arm64.iso`, `calos-v1.1.4_x86_64-nvidia.iso`. On the rolling channel the version token is `latest` (`calos-latest_x86_64.qcow2`); on tagged releases it is the tag (`calos-v1.1.4_x86_64.qcow2`).
 
-Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/callenflynn/calos/releases). Use the latest GitHub Release to identify the current version; the actual files are linked from that release into its matching SourceForge folder (for example `/1.1.4/`). SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page.
+Tagged releases (`vX.Y.Z`) are published to versioned SourceForge folders (e.g. `/1.2.0/`) and linked from [GitHub Releases](https://github.com/CStaks/calos/releases). Use the latest GitHub Release to identify the current version; the actual files are linked from that release into its matching SourceForge folder (for example `/1.1.4/`). SourceForge generates MD5/SHA1/SHA256 checksums for every file on the files page.
 
 ## Updating
 
@@ -140,7 +140,7 @@ There are also plain aliases if you prefer to skip `ujust`:
 calos-update        # sudo bootc update && sudo reboot
 calos-rollback      # sudo bootc rollback && sudo reboot
 calos-version       # sudo bootc status
-calos-switch-latest # sudo bootc switch ghcr.io/callenflynn/calos:latest && sudo reboot
+calos-switch-latest # sudo bootc switch ghcr.io/CStaks/calos:latest && sudo reboot
 ```
 
 ## What's Included
@@ -202,8 +202,8 @@ B&W
 
 Alternate Logos
 
-<img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/CalOS-71aab9.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/CalOS-7a899c.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-electric-green.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-logo-light.png?raw=true" height=120>
+<img src="https://github.com/CStaks/CalOS/blob/main/CalOS/CalOS-71aab9.png?raw=true" height=120> <img src="https://github.com/CStaks/CalOS/blob/main/CalOS/CalOS-7a899c.png?raw=true" height=120> <img src="https://github.com/CStaks/CalOS/blob/main/CalOS/calos-electric-green.png?raw=true" height=120> <img src="https://github.com/CStaks/CalOS/blob/main/CalOS/calos-logo-light.png?raw=true" height=120>
 
 Social/OpenGraphs
 
- <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-github-social-electric-green.png?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/calos-github-social.webp?raw=true" height=120> <img src="https://github.com/callenflynn/CalOS/blob/main/CalOS/light-github-social.png?raw=true" height=120>
+ <img src="https://github.com/CStaks/CalOS/blob/main/CalOS/calos-github-social-electric-green.png?raw=true" height=120> <img src="https://github.com/CStaks/CalOS/blob/main/CalOS/calos-github-social.webp?raw=true" height=120> <img src="https://github.com/CStaks/CalOS/blob/main/CalOS/light-github-social.png?raw=true" height=120>
