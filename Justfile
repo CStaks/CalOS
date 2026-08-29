@@ -192,20 +192,18 @@ rechunk $target_image=image_name $tag=default_tag:
     # temporary Containerfile, which is the most reliable way to set OCI
     # labels across all Podman/CI environments without quoting issues.
     # Just variables are captured into bash vars first to avoid Just's parser
-    # choking on dots inside the heredoc (e.g. org.opencontainers.image.title).
+    # choking on dots inside heredocs/echo args (e.g. org.opencontainers).
     _TITLE="{{ image_name }}"
     _DESC="{{ image_desc }}"
     _VENDOR="{{ repo_organization }}"
     METADATA_IMAGE="${target_image}:${tag}-metadata"
     TEMP_DF="$(mktemp)"
-    cat > "${TEMP_DF}" <<LABEL_EOF
-FROM ${target_image}:${tag}
-LABEL org.opencontainers.image.title=${_TITLE}
-LABEL org.opencontainers.image.description=${_DESC}
-LABEL org.opencontainers.image.vendor=${_VENDOR}
-LABEL org.opencontainers.image.url=https://github.com/${_VENDOR}/${_TITLE}
-LABEL org.opencontainers.image.source=https://github.com/${_VENDOR}/${_TITLE}
-LABEL_EOF
+    echo "FROM ${target_image}:${tag}" > "${TEMP_DF}"
+    echo "LABEL org.opencontainers.image.title=${_TITLE}" >> "${TEMP_DF}"
+    echo "LABEL org.opencontainers.image.description=${_DESC}" >> "${TEMP_DF}"
+    echo "LABEL org.opencontainers.image.vendor=${_VENDOR}" >> "${TEMP_DF}"
+    echo "LABEL org.opencontainers.image.url=https://github.com/${_VENDOR}/${_TITLE}" >> "${TEMP_DF}"
+    echo "LABEL org.opencontainers.image.source=https://github.com/${_VENDOR}/${_TITLE}" >> "${TEMP_DF}"
     podman build --no-cache --layers=false -f "${TEMP_DF}" -t "${METADATA_IMAGE}" .
     rm -f "${TEMP_DF}"
     podman tag "${METADATA_IMAGE}" "${target_image}:${tag}"
