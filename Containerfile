@@ -59,4 +59,4 @@ LABEL org.opencontainers.image.source="https://raw.githubusercontent.com/${REPO_
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL io.artifacthub.package.logo-url="${IMAGE_LOGO_URL}"
 LABEL io.artifacthub.package.keywords="${IMAGE_KEYWORDS}"
-LABEL io.artifacthub.package.maintainers="[{\"name\": \"callenflynn\"}]"
+LABEL io.artifacthub.package.maintainers="[{\"name\": \"Callen Flynn\", \"email\": \"cal@callen.page\"}]"
