@@ -191,15 +191,20 @@ rechunk $target_image=image_name $tag=default_tag:
     # Chunkah creates a new image config. Re-apply CalOS metadata using a
     # temporary Containerfile, which is the most reliable way to set OCI
     # labels across all Podman/CI environments without quoting issues.
+    # Just variables are captured into bash vars first to avoid Just's parser
+    # choking on dots inside the heredoc (e.g. org.opencontainers.image.title).
+    _TITLE="{{ image_name }}"
+    _DESC="{{ image_desc }}"
+    _VENDOR="{{ repo_organization }}"
     METADATA_IMAGE="${target_image}:${tag}-metadata"
     TEMP_DF="$(mktemp)"
     cat > "${TEMP_DF}" <<LABEL_EOF
 FROM ${target_image}:${tag}
-LABEL org.opencontainers.image.title={{ image_name }}
-LABEL org.opencontainers.image.description={{ image_desc }}
-LABEL org.opencontainers.image.vendor={{ repo_organization }}
-LABEL org.opencontainers.image.url=https://github.com/{{ repo_organization }}/{{ image_name }}
-LABEL org.opencontainers.image.source=https://github.com/{{ repo_organization }}/{{ image_name }}
+LABEL org.opencontainers.image.title=${_TITLE}
+LABEL org.opencontainers.image.description=${_DESC}
+LABEL org.opencontainers.image.vendor=${_VENDOR}
+LABEL org.opencontainers.image.url=https://github.com/${_VENDOR}/${_TITLE}
+LABEL org.opencontainers.image.source=https://github.com/${_VENDOR}/${_TITLE}
 LABEL_EOF
     podman build --no-cache --layers=false -f "${TEMP_DF}" -t "${METADATA_IMAGE}" .
     rm -f "${TEMP_DF}"
