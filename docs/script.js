@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const diskFile = (arch, variant, ext) =>
-        `calos-v${window.CALOS_LATEST_RELEASE || '1.1.4'}_${arch}${variant === 'nvidia' ? '-nvidia' : ''}.${ext}`;
+        `calos-v${window.CALOS_LATEST_RELEASE || '1.1.5'}_${arch}${variant === 'nvidia' ? '-nvidia' : ''}.${ext}`;
 
     const recommend = () => {
         let title, copy, filename;
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recommendationTitle.textContent = `Recommended: ${title}`;
         recommendationCopy.textContent = copy;
         if (recommendationLink && filename) {
-            const latestRelease = window.CALOS_LATEST_RELEASE || '1.1.4';
+            const latestRelease = window.CALOS_LATEST_RELEASE || '1.1.5';
             recommendationLink.href = `https://sourceforge.net/projects/calos-linux/files/${latestRelease}/${encodeURIComponent(filename)}/download`;
             recommendationLink.textContent = 'Download from SourceForge →';
         }

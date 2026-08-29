@@ -321,11 +321,11 @@ jobs:
           # Artifacts nest the actual disk images under a type dir
           # (e.g. qcow2/disk.qcow2, bootiso/install.iso) — flatten them and
           # name each file calos-<version>_<arch>[<variant>].<ext>:
-          #   calos-v1.1.4_x86_64.qcow2        standard x86_64 VM disk
-          #   calos-v1.1.4_arm64.iso           standard ARM64 installer
-          #   calos-v1.1.4_x86_64-nvidia.iso   NVIDIA installer (x86_64 only)
+          #   calos-v1.1.5_x86_64.qcow2        standard x86_64 VM disk
+          #   calos-v1.1.5_arm64.iso           standard ARM64 installer
+          #   calos-v1.1.5_x86_64-nvidia.iso   NVIDIA installer (x86_64 only)
           # On the rolling channel the version token is "latest"
-          # (calos-latest_x86_64.qcow2); on tag runs it is the tag (v1.1.4).
+          # (calos-latest_x86_64.qcow2); on tag runs it is the tag (v1.1.5).
           VERSION_TOKEN="latest"
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
             VERSION_TOKEN="${{ github.ref_name }}"
@@ -372,7 +372,7 @@ jobs:
           =================
 
           Files are named calos-<version>_<arch>[<variant>].<ext>:
-          - <version> is the release tag (e.g. v1.1.4) on releases, or
+          - <version> is the release tag (e.g. v1.1.5) on releases, or
             "latest" on the rolling channel (e.g. calos-latest_x86_64.qcow2)
           - <arch> is x86_64 or arm64
           - <variant> is -nvidia for NVIDIA builds (x86_64 only), empty otherwise
