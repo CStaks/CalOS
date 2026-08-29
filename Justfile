@@ -181,6 +181,24 @@ rechunk $target_image=image_name $tag=default_tag:
     CHUNKED_IMAGE="$(podman pull "oci:${CHUNKAH_OUTPUT_DIR}/chunked")"
     podman tag "${CHUNKED_IMAGE}" "${target_image}:${tag}"
 
+
+    # Chunkah creates a new image config. Re-apply CalOS metadata using a
+    # temporary Containerfile, which is the most reliable way to set OCI
+    # labels across all Podman/CI environments without quoting issues.
+    METADATA_IMAGE="${target_image}:${tag}-metadata"
+    TEMP_DF="$(mktemp)"
+    cat > "${TEMP_DF}" <<LABEL_EOF
+FROM ${target_image}:${tag}
+LABEL org.opencontainers.image.title={{ image_name }}
+LABEL org.opencontainers.image.description={{ image_desc }}
+LABEL org.opencontainers.image.vendor={{ repo_organization }}
+LABEL org.opencontainers.image.url=https://github.com/{{ repo_organization }}/{{ image_name }}
+LABEL org.opencontainers.image.source=https://github.com/{{ repo_organization }}/{{ image_name }}
+LABEL_EOF
+    podman build --no-cache --layers=false -f "${TEMP_DF}" -t "${METADATA_IMAGE}" .
+    rm -f "${TEMP_DF}"
+    podman tag "${METADATA_IMAGE}" "${target_image}:${tag}"
+
 # Split the image for smaller updates (Classical)!
 ostree-rechunk $target_image=image_name $tag=default_tag:
     #!/usr/bin/env bash
