@@ -222,7 +222,39 @@ jobs:
           sudo rm -f /run/libpod_lock /run/libpod/pause.pid 2>/dev/null || true
           echo 'podman storage reset done'
 
-      - name: Build disk images
+      # On ARM64, the bootc-image-builder-action's internal storage cleanup
+      # fails because the overlay mount is busy (known issue). Run BIB
+      # directly via podman to bypass the action's broken cleanup step.
+      - name: Build disk images (ARM64 direct)
+        if: matrix.architecture == 'arm64'
+        id: build
+        shell: bash
+        run: |
+          set -euo pipefail
+          CONFIG_FILE="./disk_config/disk.toml"
+          if [[ "${{ matrix.disk-type }}" == "anaconda-iso" ]]; then
+            CONFIG_FILE="./disk_config/iso-gnome.toml"
+          fi
+          mkdir -p ./output
+          # Pull images directly (our Reset step cleaned up podman state)
+          sudo podman pull ${{ env.BIB_IMAGE }}
+          sudo podman pull ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}
+          # Build the disk image via BIB
+          sudo podman run --rm --privileged \
+            --security-opt label=type:unconfined_t \
+            --volume /var/lib/containers/storage:/var/lib/containers/storage \
+            --volume ./output:/output \
+            --volume "${CONFIG_FILE}":/config.toml:ro \
+            ${{ env.BIB_IMAGE }} \
+            build --output /output \
+              --chown ${{ env.USER_UID }}:${{ env.USER_GID }} \
+              --use-librepo=True --rootfs btrfs \
+              --type ${{ matrix.disk-type }} \
+              ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}
+          echo "output-directory=./output" >> "$GITHUB_OUTPUT"
+
+      - name: Build disk images (x86_64 action)
+        if: matrix.architecture != 'arm64'
         id: build
         uses: osbuild/bootc-image-builder-action@8661cd3832544ad68c12dcde8681b13ab0f56a8d # main
         with:
