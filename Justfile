@@ -185,7 +185,8 @@ rechunk $target_image=image_name $tag=default_tag:
       --config /chunkah-config.json \
       --output oci:/run/out/chunked
 
-    CHUNKED_IMAGE="$(podman pull "oci:${CHUNKAH_OUTPUT_DIR}/chunked")"
+    CHUNKED_IMAGE="localhost/${target_image}:${tag}-chunked"
+    skopeo copy "oci:${CHUNKAH_OUTPUT_DIR}/chunked" "containers-storage:${CHUNKED_IMAGE}"
     podman tag "${CHUNKED_IMAGE}" "${target_image}:${tag}"
 
     # Chunkah creates a new image config. Re-apply CalOS metadata using a
