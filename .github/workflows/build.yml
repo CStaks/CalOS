@@ -169,9 +169,23 @@ jobs:
         env:
           ALIAS_TAGS: ${{ steps.gen-build-tags.outputs.alias_tags }}
         run: |
-          set -euox pipefail
+          set -euo pipefail
+          max_attempts=3
           for tag in ${ALIAS_TAGS}; do
-            sudo -E podman push --digestfile=/tmp/digestfile ${IMAGE_NAME}:${tag} ${IMAGE_REGISTRY}/${IMAGE_NAME}:${tag}
+            for attempt in $(seq 1 "${max_attempts}"); do
+              if sudo -E podman push --digestfile=/tmp/digestfile ${IMAGE_NAME}:${tag} ${IMAGE_REGISTRY}/${IMAGE_NAME}:${tag}; then
+                break
+              fi
+
+              if [[ "${attempt}" -eq "${max_attempts}" ]]; then
+                echo "::error::Failed to push ${IMAGE_NAME}:${tag} after ${max_attempts} attempts."
+                exit 1
+              fi
+
+              delay=$((attempt * 10))
+              echo "Push failed for ${IMAGE_NAME}:${tag} (attempt ${attempt}/${max_attempts}); retrying in ${delay}s..."
+              sleep "${delay}"
+            done
           done
 
           digest=$(< /tmp/digestfile)
@@ -215,4 +229,3 @@ jobs:
       sha: ${{ github.sha }}
       event_name: ${{ github.event_name }}
     secrets: inherit
-
